@@ -91,6 +91,12 @@ Como en el original, fuera de la partida hay **oro** y **gemas**, y todo se guar
 
 En el modo VS, el rival no lleva equipo ni niveles. Las habilidades, los objetos y todos los precios están en `js/td-meta.js`.
 
+## Música
+
+Suenan las mismas canciones del original, hechas con código y sin archivos: la del menú, un tema por raza, el del jefe de cada mundo y las de victoria y derrota. La última oleada va un poco más rápida y en pausa suena apagada.
+
+El ajuste: las 8 primeras vueltas de cada tema (32 compases) son idénticas al original. A partir de ahí, en vez de volver a empezar igual, la canción sigue subiendo de tono para siempre con la **paradoja de Shepard**. Cada nota suena en dos octavas a la vez; según sube, la de arriba se apaga y la de abajo va entrando, así que al subir una octava entera está otra vez donde empezó sin que se note el salto. Sube un semitono cada 4 compases. Los dos números están en `SHEP`, al principio de `js/td-music.js`.
+
 ## Archivos
 
 - `index.html`: la página del juego.
@@ -99,6 +105,8 @@ En el modo VS, el rival no lleva equipo ni niveles. Las habilidades, los objetos
 - `js/vendor/01-config.js` y `js/vendor/03-arte.js`: **copiados sin cambios** de Fans of Rumble (commit `42f2240`). Todos los personajes y edificios se dibujan con código, así que el arte es exactamente el mismo.
 - `js/td-data.js`: **todo el equilibrio** de la defensa de torres (las torres y la pasiva de cada raza, enemigos, oleadas, mundos y el tamaño del campo).
 - `js/td-meta.js`: el progreso fuera de la partida (oro y gemas, niveles, habilidades, equipo, gashapón, tienda y horas extra).
+- `js/vendor/05-musica.js`: las canciones del original, **copiadas sin cambios**.
+- `js/td-music.js`: el motor de música del original con el ajuste de la paradoja de Shepard.
 - `js/td-game.js`: el motor (casillas y camino más corto, oleadas, torres, dibujo, controles y menús).
 
 El progreso (estrellas) se guarda en el navegador.
