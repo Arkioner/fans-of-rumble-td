@@ -313,7 +313,7 @@ function update(dt) {
   G.t += dt;
   if (G.inWave) {
     G.spawnT -= dt; if (G.vs && !G.spawnQ.length) G.spawnT = 0;
-    while (G.spawnQ.length && G.spawnT <= 0) { const s = G.spawnQ.shift(); spawnFoe(s.k, null, FOES[s.k].boss ? G.level.hp : G.hpMul); G.spawnT += G.spawnQ.length ? G.spawnQ[0].gap : 0; }
+    while (G.spawnQ.length && G.spawnT <= 0) { const s = G.spawnQ.shift(), nf = spawnFoe(s.k, null, FOES[s.k].boss ? G.level.hp : G.hpMul); if (s.lvl > 1) unitLevel(nf, s.lvl); G.spawnT += G.spawnQ.length ? G.spawnQ[0].gap : 0; }
     if (!G.vs && !G.spawnQ.length && !G.foes.length) waveDone();
   } else if (G.wave > 0 && G.wave < G.waves && !G.over) { G.nextT -= dt; if (G.nextT <= 0) { G.nextT = 0; startWave(); } }
   // enemigos
@@ -333,7 +333,7 @@ function update(dt) {
     // en La Madriguera: la atacan una vez por segundo hasta que los tumbes
     if (f.atBase && Math.hypot(f.bx - f.x, f.by - f.y) < 2) {
       f.face = DEN.x >= f.x ? 1 : -1; f.atkT -= dt;
-      if (f.atkT <= 0) { f.atkT = TD.baseAtkCd; f.lunge = 0.25; hitBase(F.leak * (f.U ? 1 + (f.U.leak || 0) : 1), f); if (ETRAITS[G.efac].steal && G.gold > 0) { const st = Math.min(G.gold, ETRAITS[G.efac].steal); G.gold -= st; num(DEN.x + rand(-30, 30), DEN.y - 60, '-' + st + ' CAOS', '#ffcb3d', 13); } G.denHitT = 0.2; shake(1 + F.leak * 0.5); sfx('leak'); num(f.x, f.y - topOf(f) - 4, '-' + F.leak, '#ff4b5c', 15); spark(lerp(f.x, DEN.x, 0.3), f.y - 12, '#ff4b5c'); if (G.lives <= 0) finish(false); }
+      if (f.atkT <= 0) { f.atkT = TD.baseAtkCd; f.lunge = 0.25; hitBase(F.leak * (f.U ? 1 + (f.U.leak || 0) : 1) * (f.leakM || 1), f); if (ETRAITS[G.efac].steal && G.gold > 0) { const st = Math.min(G.gold, ETRAITS[G.efac].steal); G.gold -= st; num(DEN.x + rand(-30, 30), DEN.y - 60, '-' + st + ' CAOS', '#ffcb3d', 13); } G.denHitT = 0.2; shake(1 + F.leak * 0.5); sfx('leak'); num(f.x, f.y - topOf(f) - 4, '-' + F.leak, '#ff4b5c', 15); spark(lerp(f.x, DEN.x, 0.3), f.y - 12, '#ff4b5c'); if (G.lives <= 0) finish(false); }
     }
     if (f.lunge > 0) f.lunge -= dt;
     if (f.markT > 0) f.markT -= dt;
@@ -447,6 +447,7 @@ function startVS(diff) {
   const plan = []; [2, 5, 8, 11].forEach((r, ri) => { const cols = []; for (let c = 0; c < COLS; c++) if (ri % 2 ? c !== 0 : c !== COLS - 1) cols.push(c); cols.sort((a, b) => Math.abs(a - 7) - Math.abs(b - 7)); cols.forEach(c => plan.push([c, r])); });
   Object.assign(G, { screen: 'play', level: VS_LEVEL, wave: 1, waves: 1, inWave: true, nextT: 0, place: null, ghost: null, sel: null, over: false, paused: false, trayMode: 'build' });
   G.vs = { me, ai, view: 'me', t: 0, tickT: VS.tick, stolen: 0, diff, aiT: 1.5, plan, pi: 0, n: 0, def: 0, snd: 0, defDone: false };
+  me.ulvl = {}; ai.ulvl = {};   // nivel de cada unidad dentro de esta partida
   loadBoard(ai, 'ai'); reflow(); saveBoard(ai); loadBoard(me, 'me'); reflow();
   BG = bgOf(fac); hidePanel(); showScreen(null); buildTray(); hud();
   banner('VS ' + FACTIONS[rival].name.toUpperCase());
@@ -468,8 +469,19 @@ function vsSteal(to) { const V = G.vs; if (V.stolen > 0) { to.lives = Math.min(V
 function vsSend(k) {
   const V = G.vs, c = sendCost(k); if (G.over || G.gold < c) return false;
   if (V.ai.spawnQ.length >= VS.queue) { num(270, 720, 'COLA LLENA', '#ff4b5c', 14); return false; }
-  G.gold -= c; V.me.income += sendIncome(k); V.me.sent++; V.ai.spawnQ.push({ k, gap: VS.gap });
+  G.gold -= c; V.me.income += sendIncome(k); V.me.sent++; V.ai.spawnQ.push({ k, gap: VS.gap, lvl: V.me.ulvl[k] || 1 });
   num(270, 720, '+' + sendIncome(k) + ' income', '#ffcb3d', 14); sfx('horn'); return true;
+}
+// mejorar una unidad dentro de la partida: las que envíes a partir de ahora salen más duras y pegan más a la base
+const unitUpCost = (k, lvl) => Math.round(sendCost(k) * VS.upCost[lvl] / 5) * 5;
+function vsUpgrade(k) {
+  const V = G.vs, l = V.me.ulvl[k] || 1, c = unitUpCost(k, l); if (G.over || l >= TD.maxLevel) return false;
+  if (G.gold < c) { num(270, 720, 'FALTA CAOS', '#ffcb3d', 14); return false; }
+  G.gold -= c; V.me.ulvl[k] = l + 1; num(270, 720, CFG.cards[k].name + ' · NIVEL ' + (l + 1), '#c58cff', 15); sfx('up'); return true;
+}
+function unitLevel(f, lvl) {
+  const m = 1 + VS.upHp * (lvl - 1);
+  f.hp = f.maxHp = Math.round(f.maxHp * m); f.shMax = Math.round(f.shMax * m); f.sh = f.shMax; f.leakM = 1 + VS.upLeak * (lvl - 1); f.ulvl = lvl; f.sc *= 1 + 0.07 * (lvl - 1);
 }
 // el rival: reparte su oro entre defenderse y mandarte unidades
 function aiThink() {
@@ -491,7 +503,10 @@ function aiThink() {
       const opts = FACTIONS[fac].units.filter(k => sendCost(k) <= G.gold).sort((a, b) => sendCost(b) - sendCost(a)); if (!opts.length) return;
       if (early || V.me.spawnQ.length >= VS.queue) return;
       const k = opts[(Math.random() * Math.min(3, opts.length)) | 0], c = sendCost(k);
-      G.gold -= c; V.ai.income += sendIncome(k); V.ai.sent++; V.snd += c; V.me.spawnQ.push({ k, gap: VS.gap });
+      // de vez en cuando, en vez de enviar, mejora la unidad que iba a mandar
+      const ul = V.ai.ulvl[k] || 1, uc = unitUpCost(k, ul);
+      if (ul < TD.maxLevel && G.gold >= uc + c && Math.random() < VS.aiUp) { G.gold -= uc; V.ai.ulvl[k] = ul + 1; V.snd += uc; continue; }
+      G.gold -= c; V.ai.income += sendIncome(k); V.ai.sent++; V.snd += c; V.me.spawnQ.push({ k, gap: VS.gap, lvl: ul });
     }
   }
 }
@@ -672,6 +687,7 @@ function drawFoe(f) {
   if (f.stunT > 0) for (let i = 0; i < 3; i++) { const a = G.t * 5 + i * 2.1; dot(ctx, f.x + Math.cos(a) * 12, f.y - topOf(f) - 6 + Math.sin(a) * 3, 2.2, '#ffcb3d'); }
   ctx.globalAlpha = 1;
   if (f.mutCol) dot(ctx, f.x, f.y - topOf(f) - 3, 3.2, f.mutCol);
+  if (f.ulvl > 1) for (let i = 0; i < f.ulvl - 1; i++) { ctx.beginPath(); starPath(ctx, f.x + (i - (f.ulvl - 2) / 2) * 9, f.y - topOf(f) - 16, 4.6, 2); ctx.fillStyle = '#ffcb3d'; ctx.fill(); ctx.lineWidth = 1.2; ctx.strokeStyle = OL; ctx.stroke(); }
   if (f.sh > 0) { ctx.strokeStyle = 'rgba(95,227,255,.85)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(f.x, f.y - topOf(f) * 0.45, f.r * 1.25, topOf(f) * 0.62, 0, 0, Math.PI * 2); ctx.stroke(); }
   if (f.hp < f.maxHp && !FOES[f.k].boss) { const w = Math.max(24, f.r * 2.2), y = f.y - topOf(f) - 8; ctx.fillStyle = OL; ctx.fillRect(f.x - w / 2 - 1.5, y - 1.5, w + 3, 7); ctx.fillStyle = '#173d8f'; ctx.fillRect(f.x - w / 2, y, w, 4); ctx.fillStyle = '#2e8bff'; ctx.fillRect(f.x - w / 2, y, w * Math.max(0, f.hp / f.maxHp), 4); }
 }
@@ -769,10 +785,11 @@ function buildTray() {
   if (G.vs && G.trayMode === 'send') {
     // modo VS: las 6 unidades de tu raza, para mandárselas al rival
     for (const k of FACTIONS[G.fac].units) {
-      const C = CFG.cards[k], b = document.createElement('button'); b.className = 'card r-' + C.rarity; b.dataset.k = k; b.dataset.send = '1'; b.setAttribute('aria-label', `Enviar ${C.name}: ${sendCost(k)} de CAOS, +${sendIncome(k)} de income`);
-      b.innerHTML = `<canvas></canvas><span class="nm">+${sendIncome(k)} income</span><span class="cost ol">${sendCost(k)}</span>`;
+      const C = CFG.cards[k], b = document.createElement('button'), l = G.vs.me.ulvl[k] || 1, max = l >= TD.maxLevel; b.className = 'card send r-' + C.rarity; b.dataset.k = k; b.dataset.send = '1';
+      b.setAttribute('aria-label', `Enviar ${C.name} de nivel ${l}: ${sendCost(k)} de CAOS, +${sendIncome(k)} de income`);
+      b.innerHTML = `<canvas></canvas><span class="nm">${l > 1 ? '★'.repeat(l - 1) + ' ' : ''}+${sendIncome(k)} income</span><span class="cost ol">${sendCost(k)}</span><span class="upg ol${max ? ' max' : ''}" role="button" aria-label="Mejorar ${C.name}">${max ? 'MÁX' : '▲ ' + unitUpCost(k, l)}</span>`;
       tray.appendChild(b); requestAnimationFrame(() => portrait(b.querySelector('canvas'), k, C.rarity === 'epic' ? 40 : 34));
-      b.addEventListener('pointerdown', e => { e.preventDefault(); vsSend(k); hud(); });
+      b.addEventListener('pointerdown', e => { e.preventDefault(); if (e.target.closest('.upg')) { if (vsUpgrade(k)) buildTray(); hud(); return; } vsSend(k); hud(); });
     }
     return;
   }
@@ -787,7 +804,7 @@ function buildTray() {
 }
 function showInfo(k) { const C = CFG.cards[k], D = TOWERS[G.fac][k]; $('#info').innerHTML = `<b>${C.name}</b> · ${D.desc}`; $('#info').hidden = false; }
 function refreshTray() {
-  for (const b of document.querySelectorAll('#cards .card')) { const k = b.dataset.k; if (b.dataset.send) { b.classList.toggle('off', G.gold < sendCost(k)); continue; } const D = TOWERS[G.fac][k]; const used = D.leader && G.towers.some(t => t.k === k); b.classList.toggle('off', G.gold < D.cost || used); b.classList.toggle('sel', G.place === k); b.classList.toggle('used', !!used); }
+  for (const b of document.querySelectorAll('#cards .card')) { const k = b.dataset.k; if (b.dataset.send) { const l = G.vs.me.ulvl[k] || 1; b.classList.toggle('off', G.gold < sendCost(k)); b.querySelector('.upg').classList.toggle('no', l < TD.maxLevel && G.gold < unitUpCost(k, l)); continue; } const D = TOWERS[G.fac][k]; const used = D.leader && G.towers.some(t => t.k === k); b.classList.toggle('off', G.gold < D.cost || used); b.classList.toggle('sel', G.place === k); b.classList.toggle('used', !!used); }
   if (!G.place) $('#info').hidden = true;
 }
 function hud() {
@@ -945,7 +962,7 @@ async function boot() {
   fit(); addEventListener('resize', fit); soundBtns();
   showMenu();
   portrait($('#title-art'), 'bunny', 150); portrait($('#title-foe'), 'fallen', 110, -1);
-  window.__TD = { G, TOWERS, cardMods, pull, equip, levelUp, idleRates, startVS, vsUpdate, vsSend, vsView, fuse, fuseMate, startLevel, startWave, build, sell, upgrade, update, canPlace, whyNot, flow, BLOCK, ENTRY, WORLDS_TD, SAVE, get DIST() { return DIST; } };   // para las pruebas automáticas
+  window.__TD = { G, TOWERS, vsUpgrade, cardMods, pull, equip, levelUp, idleRates, startVS, vsUpdate, vsSend, vsView, fuse, fuseMate, startLevel, startWave, build, sell, upgrade, update, canPlace, whyNot, flow, BLOCK, ENTRY, WORLDS_TD, SAVE, get DIST() { return DIST; } };   // para las pruebas automáticas
   requestAnimationFrame(frame);
 }
 boot();

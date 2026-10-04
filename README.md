@@ -63,7 +63,8 @@ Los niveles salen de una regla (`LEVEL_RULE` en `js/td-data.js`): según avanzas
 
 En la pantalla de campaña, elige tu raza y pulsa **MODO VS** (fácil, normal o difícil). Juegas contra un rival que lleva el juego, con una raza al azar distinta de la tuya. Cada uno defiende su campo y manda unidades al del otro.
 
-- Pulsa **ENVIAR UNIDADES** para cambiar las cartas de torres por las 6 unidades de tu raza. Cada envío cuesta CAOS, sale por la puerta del campo rival y **sube tu income** para siempre.
+- Pulsa **ENVIAR UNIDADES** para cambiar las cartas de torres por las 6 unidades de tu raza. Cada envío cuesta CAOS, sale por la puerta del campo rival y **sube tu income** para siempre (un 15 % de lo que cuesta).
+- Cada carta de unidad tiene debajo un botón **▲** para **mejorarla** dentro de la partida (hasta el nivel 3): las que envíes desde entonces tienen un 60 % más de vida y pegan un 50 % más a la base rival por nivel, al mismo precio de envío.
 - El **income** es el CAOS que recibes cada 10 segundos. Empieza en 20. Aquí las bajas dan poco CAOS: viene de enviar.
 - Las unidades que llegan a la base rival le quitan vida y **esa vida se suma a tu base** (hasta 150).
 - Tus unidades llevan la pasiva de tu raza (los No-Muertos se levantan una vez, los Ciberpunks llevan escudo, etc.).

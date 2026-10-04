@@ -210,3 +210,9 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 #toast { position: absolute; left: 50%; top: 86px; transform: translateX(-50%); max-width: 440px; background: var(--panel); border: 3px solid var(--gold); border-radius: 13px; padding: 9px 14px 7px; font-size: 14px; font-weight: 700; text-align: center; opacity: 0; pointer-events: none; z-index: 30; }
 #toast.show { animation: toast 3.2s ease-out; }
 @keyframes toast { 0% { opacity: 0; transform: translate(-50%, -12px); } 8% { opacity: 1; transform: translate(-50%, 0); } 85% { opacity: 1; } 100% { opacity: 0; } }
+.card.send canvas { height: 74px; }
+.upg { position: absolute; left: 3px; right: 3px; bottom: 4px; font-family: var(--font-display); font-size: 13px; line-height: 1; padding: 6px 2px 3px; border-radius: 8px; border: 2px solid var(--outline); background: linear-gradient(to bottom, #d9a8ff, #7a35c9); color: var(--ink); text-align: center; }
+.upg.no { filter: grayscale(0.85) brightness(0.75); }
+.upg.max { background: var(--tray); color: var(--ink-dim); }
+.card.send.off { filter: none; }
+.card.send.off canvas, .card.send.off .nm, .card.send.off .cost { filter: grayscale(0.85) brightness(0.75); }

@@ -36,6 +36,9 @@ const VS = {
   hpDouble: 75,         // cada tantos segundos se dobla la vida de las unidades enviadas (para que la partida acabe)
   queue: 12,            // máximo de unidades esperando para salir hacia un campo
   gap: 0.45,            // segundos entre dos unidades enviadas
+  upCost: [0, 3, 6],    // mejorar una unidad a nivel 2 cuesta 3 veces lo que cuesta enviarla; a nivel 3, 6 veces
+  upHp: 0.6, upLeak: 0.5, // cada nivel: +60 % de vida y +50 % de daño a la base rival
+  aiUp: 0.2,            // probabilidad de que el rival mejore una unidad en vez de enviarla
   aiGrace: 30,          // segundos que el rival tarda en mandarte la primera unidad
   aiDef: 1.3,           // el rival gasta este oro en defensa por cada 1 que gasta en enviar
   ai: { facil: 0.7, normal: 1, dificil: 1.35 },   // income del rival según la dificultad
