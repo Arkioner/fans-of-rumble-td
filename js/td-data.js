@@ -134,7 +134,7 @@ const TOWERS = {
   },
   memes: {
     memelord:    { cost: 150, kind: 'shot',  dmg: 28, cd: 1.1, range: 105, shot: 'card', leader: true, viral: { cd: 7 },
-                   desc: 'Líder (solo uno). Cada 7 s juega una carta al azar: bola de fuego, aturdir, oro o una jauría de perros.' },
+                   desc: 'Líder (solo uno). Cada 7 s juega una carta al azar: bola de fuego, aturdir, CAOS o una jauría de perros.' },
     suchdog:     { cost: 50, kind: 'hit',   dmg: 16, cd: 0.5, range: 68, n: 2,
                    desc: 'Dos perros muy wow. Baratos y muerden rápido.' },
     gifblaster:  { cost: 70, kind: 'shot',  dmg: 10, cd: 0.3, range: 110, shot: 'gif',
@@ -201,7 +201,7 @@ const TOWERS = {
 // Pasiva de cada raza, adaptada a la defensa de torres (el nombre es el del original)
 const PASSIVES = {
   animales:  { txt: 'Cada torre pega un 10 % más por cada torre aliada en las casillas de alrededor, hasta +50 %.' },
-  nomuertos: { txt: 'Los no-muertos siempre vuelven: al vender una torre recuperas todo el oro, así que puedes rehacer el laberinto gratis.' },
+  nomuertos: { txt: 'Los no-muertos siempre vuelven: al vender una torre recuperas todo el CAOS, así que puedes rehacer el laberinto gratis.' },
   streamers: { per: 10, step: 0.05, max: 5, txt: 'Cada 10 bajas, todas tus torres atacan un 5 % más rápido (hasta +25 %).' },
   heroes:    { per: 12, step: 0.05, max: 5, txt: 'Cada 12 bajas subes de nivel: +5 % de daño a todas tus torres (hasta nivel 5).' },
   ciber:     { amt: 25, delay: 3, regen: 6, txt: 'Tu base lleva un escudo de plasma de 25 que se recarga si pasa 3 s sin recibir daño.' },
@@ -261,7 +261,7 @@ const ETRAITS = {
   olvidados:  { fog: 2, txt: 'NOSTALGIA: tus torres tardan 2 s en acordarse de cada enemigo antes de dispararle.' },
   gamer:      { txt: 'COMUNIDAD: juntos son más fuertes, todos tienen mucha más vida.' },
   pop:        { chance: 0.3, hp: 0.5, scale: 0.82, txt: 'SECUELA: 3 de cada 10 enemigos vuelven en versión «2», con la mitad de vida.' },
-  phony:      { steal: 2, txt: 'SUSCRIPCIÓN: cada golpe a tu base te quita además 2 de oro.' },
+  phony:      { steal: 2, txt: 'SUSCRIPCIÓN: cada golpe a tu base te quita además 2 de CAOS.' },
 };
 
 // Los 12 mundos de la historia del original, con sus niveles y su jefe (el 4.º nivel de cada mundo).

@@ -18,7 +18,7 @@
   <div id="ui">
     <header id="hud" hidden>
       <button class="icon-btn" id="btn-pause" aria-label="Pausar"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="5" height="16" rx="1.5" fill="currentColor"/><rect x="14" y="4" width="5" height="16" rx="1.5" fill="currentColor"/></svg></button>
-      <div class="chip ol" title="Oro"><span class="coin"></span><span id="gold">0</span></div>
+      <div class="chip ol" title="CAOS: lo que gastas en torres dentro de la partida"><span class="coin"></span><span id="gold">0</span></div>
       <div class="chip ol" title="Vida de La Madriguera"><span class="heart">♥</span><span id="lives">20</span></div>
       <div class="chip ol" title="Oleada"><span id="wave-l">OLEADA</span> <span id="wave">0/0</span></div>
       <button class="icon-btn small ol" id="btn-speed" aria-label="Velocidad">x1</button>
@@ -32,13 +32,36 @@
     <footer id="tray" hidden><div id="cards"></div></footer>
 
     <section class="screen" id="scr-title" hidden>
-      <button class="icon-btn btn-sound corner" aria-label="Silenciar sonido">🔊</button>
+      <div class="menu-top"><div class="wallet" data-wallet></div><button class="icon-btn btn-sound" aria-label="Silenciar sonido">🔊</button></div>
       <div class="logo ol-big">FANS OF<br>RUMBLE</div>
       <div class="logo-sub ol">TOWER DEFENSE</div>
       <div class="title-art"><canvas id="title-art"></canvas><span class="vs ol-big">VS</span><canvas id="title-foe"></canvas></div>
-      <p class="story">Microblizz, una empresa millonaria, ha comprado el estudio que hacía tus juegos favoritos para despedir a todos y cerrarlos. Sus robots marchan hacia <b>La Madriguera</b>. Pon torres en la explanada, oblígales a dar vueltas por tu laberinto y que no llegue ni un becario.</p>
       <button class="btn-big ol" id="btn-play">JUGAR</button>
-      <p class="hint">Arrastra una carta a una casilla (o tócala y luego toca la casilla). No puedes cerrar el camino del todo. Toca una torre para mejorarla o venderla.</p>
+      <div class="menu-row"><button class="btn-menu ol" id="btn-coll">EQUIPO</button><button class="btn-menu ol" id="btn-gacha">GASHAPÓN</button><button class="btn-menu ol" id="btn-shop">TIENDA<i id="gift-dot" hidden></i></button></div>
+      <div id="idle-box"></div>
+    </section>
+
+    <section class="screen" id="scr-coll" hidden>
+      <div class="map-head"><button class="btn-ghost ol" data-back aria-label="Volver">‹</button><div class="ol-big map-t">EQUIPO</div><div class="wallet" data-wallet></div></div>
+      <div id="coll-facs" class="fac-row"></div>
+      <div id="coll-list" class="scroll"></div>
+    </section>
+
+    <section class="screen" id="scr-gacha" hidden>
+      <div class="map-head"><button class="btn-ghost ol" data-back aria-label="Volver">‹</button><div class="ol-big map-t">GASHAPÓN</div><div class="wallet" data-wallet></div></div>
+      <div class="tabs" role="group" aria-label="Máquina"><button class="tab ol" data-gt="ab">Habilidades</button><button class="tab ol" data-gt="eq">Equipo</button></div>
+      <p class="sub" id="gacha-sub"></p>
+      <div class="pull-row"><button class="btn-pull ol" id="pull-1"></button><button class="btn-pull x10 ol" id="pull-10"></button></div>
+      <p class="small-print" id="gacha-odds"></p>
+      <div id="gacha-res" class="scroll"></div>
+    </section>
+
+    <section class="screen" id="scr-shop" hidden>
+      <div class="map-head"><button class="btn-ghost ol" data-back aria-label="Volver">‹</button><div class="ol-big map-t">TIENDA</div><div class="wallet" data-wallet></div></div>
+      <p class="sub"><b>Tienda de Microblizz</b> · Versión de prueba: aquí no se cobra nada. Lo que «compres» te llega gratis.</p>
+      <div id="gift-row"></div>
+      <div class="tabs" role="group" aria-label="Sección"><button class="tab ol" data-st="gold">Oro</button><button class="tab ol" data-st="gems">Gemas</button></div>
+      <div id="shop-list" class="scroll"></div>
     </section>
 
     <section class="screen" id="scr-map" hidden>
@@ -58,6 +81,10 @@
       <div class="res-b"><button class="btn-big ol" id="res-next">SIGUIENTE</button><button class="btn-ghost ol" id="res-retry">REPETIR</button><button class="btn-ghost ol" id="res-map">MAPA</button></div>
     </section>
 
+    <section class="modal" id="scr-card" hidden><div class="box wide" id="card-box"></div></section>
+    <section class="modal" id="scr-pick" hidden><div class="box wide" id="pick-box"></div></section>
+    <div id="toast" role="status"></div>
+
     <section class="modal" id="scr-pause" hidden>
       <div class="box"><div class="ol-big">PAUSA</div><button class="btn-big ol" id="pz-go">SEGUIR</button><button class="btn-ghost ol" id="pz-retry">REPETIR</button><button class="btn-ghost ol" id="pz-map">SALIR AL MAPA</button><button class="icon-btn btn-sound" aria-label="Silenciar sonido">🔊</button></div>
     </section>
@@ -69,6 +96,7 @@
 <script src="js/vendor/03-arte.js"></script>
 <!-- La defensa de torres -->
 <script src="js/td-data.js"></script>
+<script src="js/td-meta.js"></script>
 <script src="js/td-game.js"></script>
 </body>
 </html>
