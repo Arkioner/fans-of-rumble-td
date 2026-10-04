@@ -16,38 +16,29 @@ Es un tower defense clásico de laberinto:
 - Cada nivel tiene un número fijo de **oleadas**. Si acabas con todos los enemigos de la última, ganas. Cuanta más vida le quede a La Madriguera, más estrellas.
 - Toca una torre para **mejorarla** (hasta el nivel 3) o **venderla** (recuperas el 60 % y el camino se vuelve a abrir).
 - Pulsa **¡OLEADA!** para que empiece la siguiente oleada. Si la llamas antes de tiempo, ganas oro extra.
-- **RABIA** (la pasiva de los Animales Locos): cada torre pega un 10 % más por cada torre aliada en las casillas de alrededor, hasta +50 %.
+- Antes de entrar a un nivel, elige tu **raza** en la pantalla de campaña. Cada una tiene sus torres y su pasiva.
 
-## Facciones en el orden de la historia
+## Razas
 
-Las razas se unen en el mismo orden que en la campaña del original: cada mundo liberado trae su facción.
+En la pantalla de campaña eliges con qué raza juegas. Las nueve del original están disponibles desde el principio, cada una con sus 7 torres (su líder y sus 6 unidades), su base, su decorado y su pasiva adaptada a la defensa de torres:
 
-| Mundo | Lugar | Facción | Estado |
-|---|---|---|---|
-| 1 | Oficinas de Microblizz | Animales Locos (inicio) | Jugable: 4 niveles y el jefe SurvivalBot |
-| 2 | Cementerio de juegos | No-Muertos | Próximamente |
-| 3 | Plató Abandonado | Streamers | Próximamente |
-| 4 | Olimpo Abandonado | Héroes | Próximamente |
-| 5 | Sector Neón | Ciberpunks | Próximamente |
-| 6 | El Foro Infinito | Memes | Próximamente |
-| 7 | Torre de Microblizz | — | Próximamente |
-| 8 | El Sótano de Microblizz | Olvidados | Próximamente |
-| 9 | Tiendas sin discos | — (Phony) | Próximamente |
-| 10 | La LAN Party | Comunidad Gamer | Próximamente |
-| 11 | Estudios Phony | Cultura Pop | Próximamente |
-| 12 | Sede de Phony | — | Próximamente |
-
-### Torres de los Animales Locos
-
-| Torre | Oro | Qué hace |
+| Raza | Líder | Pasiva |
 |---|---|---|
-| CrazyBunny (líder) | 150 | Solo uno. Cada 8 s salta sobre el grupo más grande: daño en área y aturde. |
-| MadSquirrel | 50 | Dos ardillas que tiran bellotas muy rápido. |
-| BoomBeaver | 70 | Dinamita con daño en área. |
-| SlyFox | 85 | Cada tercer golpe hace el triple. |
-| MeerCat | 80 | No ataca: las torres cercanas atacan un 30 % más rápido. |
-| JunkCoon | 110 | Bolsas de basura desde lejos: área y ralentiza. |
-| MechaVaca | 160 | Pisotón que golpea a todos alrededor y los frena. |
+| Animales Locos | CrazyBunny | **RABIA**: cada torre pega un 10 % más por cada torre aliada en las casillas de alrededor, hasta +50 %. |
+| No-Muertos | NecroLord | **RENACER**: al vender una torre recuperas todo el oro, así que puedes rehacer el laberinto gratis. |
+| Streamers | StreamKing | **HYPE**: cada 10 bajas, todas tus torres atacan un 5 % más rápido (hasta +25 %). |
+| Héroes | EpicChampion | **EXPERIENCIA**: cada 12 bajas, +5 % de daño a todas tus torres (hasta +25 %). |
+| Ciberpunks | CyberMarine | **ESCUDOS**: tu base lleva un escudo de 25 que se recarga si pasa 3 s sin recibir daño. |
+| Memes | MemeLord | **RNG**: cada torre sale con una mutación al azar (gigante, turbo, de cristal o normal). |
+| Comunidad Gamer | ProGamer | **COMUNIDAD**: +5 % de daño por cada tipo distinto de torre en el campo (hasta +30 %). |
+| Olvidados | VikingoPerdido | **NOSTALGIA**: el primer golpe de cada torre a cada enemigo hace el doble de daño. |
+| Cultura Pop | LaDirectora | **SECUELA**: 3 de cada 10 ataques se repiten enseguida con la mitad de daño. |
+
+Cada raza tiene la misma escalera de precios: una torre barata para levantar muros (45-50 de oro), torres medias (60-130), una torre grande (160) y su líder (150, solo uno en el campo). Lo que hace cada torre se lee al tocar su carta, y todos los números están en `js/td-data.js`.
+
+## Campaña
+
+De momento solo se puede jugar el mundo 1 (Oficinas de Microblizz: 4 niveles y el jefe SurvivalBot). Los otros 11 mundos de la historia aparecen en el mapa como bloqueados.
 
 ## Archivos
 
@@ -55,7 +46,7 @@ Las razas se unen en el mismo orden que en la campaña del original: cada mundo 
 - `css/td.css`: aspecto (mismos colores, letras y botones que el original).
 - `js/00-utils.js`: utilidades pequeñas que el arte del original necesita.
 - `js/vendor/01-config.js` y `js/vendor/03-arte.js`: **copiados sin cambios** de Fans of Rumble (commit `42f2240`). Todos los personajes y edificios se dibujan con código, así que el arte es exactamente el mismo.
-- `js/td-data.js`: **todo el equilibrio** de la defensa de torres (torres, enemigos, oleadas, mundos y el tamaño del campo).
+- `js/td-data.js`: **todo el equilibrio** de la defensa de torres (las torres y la pasiva de cada raza, enemigos, oleadas, mundos y el tamaño del campo).
 - `js/td-game.js`: el motor (casillas y camino más corto, oleadas, torres, dibujo, controles y menús).
 
 El progreso (estrellas) se guarda en el navegador.

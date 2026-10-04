@@ -105,6 +105,12 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 .map-head { display: flex; align-items: center; justify-content: space-between; width: 100%; }
 .map-t { font-size: 40px; color: var(--gold); }
 #map-team { font-weight: 800; font-size: 15px; margin: 10px 0 8px; color: var(--ink-dim); align-self: flex-start; }
+#fac-pick { display: grid; grid-template-columns: repeat(9, 1fr); gap: 5px; width: 100%; }
+.fac { padding: 0; border: 3px solid var(--outline); border-radius: 12px; background: var(--tray-hi); cursor: pointer; box-shadow: 0 3px 0 var(--outline); overflow: hidden; }
+.fac canvas { width: 100%; height: 50px; display: block; pointer-events: none; }
+.fac.sel { background: var(--gold); transform: translateY(-3px); box-shadow: 0 6px 0 var(--outline); }
+#fac-pas { font-size: 13px; line-height: 1.25; font-weight: 600; margin: 9px 0 8px; align-self: flex-start; min-height: 3.75em; }
+#fac-pas b { font-family: var(--font-display); font-weight: 400; color: var(--gold); letter-spacing: 0.3px; }
 #worlds { width: 100%; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 4px 2px 20px; box-sizing: border-box; touch-action: pan-y; }
 .world { background: var(--panel); border: 3px solid var(--outline); border-radius: 16px; padding: 9px 10px 10px; box-shadow: 0 4px 0 var(--outline); }
 .world.locked { opacity: 0.55; }
