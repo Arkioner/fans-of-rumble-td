@@ -148,7 +148,7 @@ function musicUpdate() {
   M.tmT = lastWave ? 1.18 : 1;                                // la última oleada va más rápida
   const duck = s === 'play' && G.paused;                      // en pausa suena apagada
   if (duck !== M.duck) { M.duck = duck; M.lp.frequency.setTargetAtTime(duck ? 600 : 18000, AC.currentTime, 0.08); }
-  M.bus.gain.setTargetAtTime(SAVE.muted ? 0 : MUS_VOL, AC.currentTime, 0.05);
+  M.bus.gain.setTargetAtTime(SAVE.muted ? 0 : MUS_VOL * (SAVE.vol == null ? 1 : SAVE.vol) * (SAVE.mus == null ? 1 : SAVE.mus), AC.currentTime, 0.05);
 }
 // el navegador solo deja sonar después del primer toque
 function musicWake() { try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); } catch (e) { /* sin sonido */ } }

@@ -104,6 +104,12 @@ Suenan las mismas canciones del original, hechas con código y sin archivos: la 
 
 El ajuste: las 8 primeras vueltas de cada tema (32 compases) son idénticas al original. A partir de ahí, en vez de volver a empezar igual, la canción sigue subiendo de tono para siempre con la **paradoja de Shepard**. Cada nota suena en dos octavas a la vez; según sube, la de arriba se apaga y la de abajo va entrando, así que al subir una octava entera está otra vez donde empezó sin que se note el salto. Sube un semitono cada 4 compases. Los dos números están en `SHEP`, al principio de `js/td-music.js`.
 
+## Opciones e instalar
+
+En el menú principal, **Opciones** tiene lo mismo que el original que tiene sentido aquí: volumen, música, números de daño, temblor de pantalla, modo pruebas (todo abierto, 3.000.000 de oro y 5.000 gemas), pasar el progreso a otro dispositivo con un código, novedades y empezar de cero.
+
+**Instalar** abre el juego como una app, a pantalla completa (`manifest.webmanifest`). Instalado o no, cuando se abre desde la web guarda una copia para funcionar sin conexión (`sw.js`); siempre que hay conexión pide primero la última versión.
+
 ## Archivos
 
 - `index.html`: la página del juego.

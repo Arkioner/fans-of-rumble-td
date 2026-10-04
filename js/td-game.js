@@ -8,7 +8,7 @@ function loadSave() { try { const o = JSON.parse(localStorage.getItem(SAVE_KEY))
 let SAVE = loadSave();
 function saveGame() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(SAVE)); } catch (e) { /* el progreso vive en memoria */ } }
 const starsOf = id => SAVE.stars[id] || 0;
-const levelOpen = L => L.li === 0 ? L.wi === 0 || worldDone(L.wi - 1) : starsOf(WORLDS_TD[L.wi].levels[L.li - 1].id) > 0;
+const levelOpen = L => SAVE.testAll ? true : L.li === 0 ? L.wi === 0 || worldDone(L.wi - 1) : starsOf(WORLDS_TD[L.wi].levels[L.li - 1].id) > 0;
 const worldDone = wi => { const w = WORLDS_TD[wi]; return !!w.levels && w.levels.every(l => starsOf(l.id) > 0); };
 
 const G = { screen: 'title', t: 0, speed: 1, paused: false, level: null, gold: 0, lives: 0, wave: 0, waves: 0, inWave: false, nextT: 0, spawnQ: [], spawnT: 0,
@@ -256,7 +256,7 @@ function hurt(f, dmg, crit) {
   if (f.sh > 0) { const a = Math.min(f.sh, dmg); f.sh -= a; dmg -= a; if (dmg <= 0) return; }
   if (f.U && f.U.pause && !f.paused && f.hp - dmg <= 0) { f.paused = true; f.invT = f.U.pause; pop(f.x, f.y - topOf(f) - 8, '¡PAUSA!', '#9fe8ff', 14); return; }
   f.hp -= dmg;
-  if (crit || dmg >= 20) num(f.x + rand(-6, 6), f.y - topOf(f) - 6, Math.round(dmg), crit ? '#ffcb3d' : '#fff6ea', crit ? 18 : 13);
+  if ((crit || dmg >= 20) && SAVE.nums !== false) num(f.x + rand(-6, 6), f.y - topOf(f) - 6, Math.round(dmg), crit ? '#ffcb3d' : '#fff6ea', crit ? 18 : 13);
   if (f.hp <= 0) kill(f);
 }
 function kill(f) {
@@ -558,7 +558,7 @@ const num = (x, y, s, col, size = 14) => G.nums.push({ x, y, s: String(s), col, 
 const pop = (x, y, s, col, size = 18) => G.nums.push({ x, y, s, col, size, t: 0, life: 1.3, big: true });
 const ring = (x, y, r, col) => G.parts.push({ kind: 'ring', x, y, r, col, t: 0, life: 0.35 });
 const spark = (x, y, col) => G.parts.push({ kind: 'dot', x, y, col, r: 4, t: 0, life: 0.18 });
-const shake = n => { if (!REDUCED) G.shake = Math.max(G.shake || 0, n); };
+const shake = n => { if (!REDUCED && SAVE.shake !== false) G.shake = Math.max(G.shake || 0, n); };
 function puff(x, y, col, n) { for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, s = rand(20, 70); G.parts.push({ kind: 'dot', x, y: y - 4, vx: Math.cos(a) * s, vy: Math.sin(a) * s * 0.5 - 20, col, r: rand(2, 4.5), t: 0, life: rand(0.3, 0.55) }); } }
 function burst(x, y, cols, r) { for (let i = 0; i < 8 + r * 0.4; i++) { const a = Math.random() * Math.PI * 2, s = rand(40, 130); G.parts.push({ kind: 'dot', x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 60, g: 260, col: pick(cols), r: rand(2, 4), t: 0, life: rand(0.35, 0.6) }); } }
 function slash(x, y, crit) { G.parts.push({ kind: 'slash', x, y, col: crit ? '#ffcb3d' : '#fff6ea', r: crit ? 20 : 13, a: rand(-0.6, 0.6), t: 0, life: 0.18 }); if (crit) pop(x, y - 22, '¡ZAS!', '#ffcb3d', 17); }
@@ -579,7 +579,8 @@ function sfx(k) {
     leak: [220, 110, 0.35, 'sawtooth', 0.09], horn: [196, 262, 0.45, 'sawtooth', 0.07], jump: [300, 1000, 0.3, 'triangle', 0.07], zap: [1200, 300, 0.12, 'sawtooth', 0.05], womp: [200, 80, 0.4, 'square', 0.08], boss: [110, 70, 0.8, 'sawtooth', 0.1], win: [523, 1046, 0.6, 'triangle', 0.1] }[k];
   if (!S) return; const [f0, f1, d, type, vol] = S, t = AC.currentTime, o = AC.createOscillator(), g = AC.createGain();
   o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + d);
-  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0008, t + d); o.connect(g).connect(AC.destination); o.start(t); o.stop(t + d + 0.02);
+  const v = vol * (SAVE.vol == null ? 1 : SAVE.vol); if (v <= 0) return;
+  g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.0008, t + d); o.connect(g).connect(AC.destination); o.start(t); o.stop(t + d + 0.02);
 }
 
 /* =========================================================
@@ -931,7 +932,7 @@ function showMap() {
   G.screen = 'map'; showScreen('scr-map');
   const list = $('#worlds'); buildFacPick();
   list.innerHTML = WORLDS_TD.map((w, wi) => {
-    const open = wi === 0 || worldDone(wi - 1), E = FACTIONS[w.efac];
+    const open = SAVE.testAll || wi === 0 || worldDone(wi - 1), E = FACTIONS[w.efac];
     const lv = `<div class="lvls">${w.levels.map(l => { const o = levelOpen(l), s = starsOf(l.id); return `<button class="lvl${l.boss ? ' boss' : ''}" data-l="${l.id}" ${o ? '' : 'disabled'}><b>${l.id}</b><span>${l.name}</span><i>${o ? '★'.repeat(s) + '<em>' + '★'.repeat(3 - s) + '</em>' : '🔒'}</i></button>`; }).join('')}</div>`;
     return `<div class="world${open ? '' : ' locked'}"><div class="wh"><canvas data-k="${E.leader || E.units[0]}"></canvas><div><div class="wn ol">Mundo ${wi + 1} · ${w.name}</div><div class="wj">${open ? w.story : 'Libera el mundo anterior para entrar.'}</div></div></div>${open ? `<div class="wt"><b>Enemigos: ${CORP[w.efac] || E.corr || E.name + ' corrompidos'}.</b> ${ETRAITS[w.efac].txt}</div>` : ''}${lv}</div>`;
   }).join('');

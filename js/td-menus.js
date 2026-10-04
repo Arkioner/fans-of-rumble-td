@@ -391,6 +391,11 @@ function toast(msg, good) { const t = $('#toast'); t.textContent = msg; t.classL
    Con cada versión nueva hay que subir VERSION (en td-meta.js) y poner aquí arriba del todo lo que cambia.
    ========================================================= */
 const NEWS = [
+  { v: '0.7.0', real: [
+      '<b>Opciones</b>: volumen, música, números de daño, temblor de pantalla y modo pruebas. Están en el menú principal.',
+      '<b>Instalar</b>: desde Opciones puedes instalar el juego como una app, a pantalla completa. Instalado también funciona sin conexión.',
+      '<b>Pasar el progreso</b> a otro móvil o PC con un código, y empezar de cero si quieres.'],
+    joke: ['Microblizz ha añadido un botón de opciones. La opción de no pagar sigue en desarrollo.', 'Phony recuerda que instalar el juego no te da la propiedad del juego.'] },
   { v: '0.6.1', real: [
       '<b>Arreglado el parpadeo de las cartas de torres</b>: durante la partida se apagaban y encendían solas varias veces por segundo. Ahora solo se apagan cuando no te llega el CAOS.'],
     joke: ['Microblizz aclara que el parpadeo era una función prémium de discoteca. Se retira por falta de suscriptores.'] },
@@ -447,3 +452,63 @@ $('#btn-mass').onclick = massScrap;
 $('#btn-item-close').onclick = () => { $('#scr-item').hidden = true; itemCur = null; play('select'); };
 $('#btn-pick-close').onclick = () => { $('#scr-pick').hidden = true; play('select'); };
 for (const b of document.querySelectorAll('[data-st]')) b.onclick = () => { shopTab = b.dataset.st; play('select'); buildShop(); };
+
+/* =========================================================
+   OPCIONES E INSTALAR (como en el original, con lo que tiene sentido en la defensa de torres)
+   ========================================================= */
+const optOn = k => SAVE[k] !== false;   // números de daño y temblor vienen activados
+function openOptions() {
+  show('scr-options'); updateWallets();
+  $('#opt-vol').value = Math.round((SAVE.vol == null ? 1 : SAVE.vol) * 100); $('#opt-mus').value = Math.round((SAVE.mus == null ? 1 : SAVE.mus) * 100);
+  optButtons(); $('#save-code').value = ''; $('#opt-ver').textContent = 'Fans of Rumble TD · versión ' + VERSION;
+}
+function optButtons() {
+  $('#btn-nums').textContent = optOn('nums') ? 'SÍ' : 'NO'; $('#btn-shake').textContent = optOn('shake') ? 'SÍ' : 'NO';
+  $('#btn-test').textContent = SAVE.testAll ? 'ACTIVADO' : 'ACTIVAR'; $('#btn-test').disabled = !!SAVE.testAll;
+}
+$('#btn-opts').onclick = () => { play('select'); openOptions(); };
+$('#opt-vol').oninput = e => { SAVE.vol = e.target.value / 100; if (SAVE.vol > 0 && SAVE.muted) { SAVE.muted = false; soundBtns(); } saveGame(); };
+$('#opt-vol').onchange = () => play('select');
+$('#opt-mus').oninput = e => { SAVE.mus = e.target.value / 100; saveGame(); };
+$('#btn-nums').onclick = () => { SAVE.nums = !optOn('nums'); saveGame(); play('select'); optButtons(); };
+$('#btn-shake').onclick = () => { SAVE.shake = !optOn('shake'); saveGame(); play('select'); optButtons(); };
+// modo pruebas: todo abierto y dinero de sobra (subir de nivel lo haces tú en la Colección)
+$('#btn-test').onclick = () => confirmBox('MODO PRUEBAS', 'Abre todos los mundos, da toda la experiencia hasta el nivel 10 a todas las cartas, <b>3.000.000 de oro</b> y <b>5.000 gemas</b>.<small>No se puede deshacer, salvo empezando de cero.</small>', 'ACTIVAR', () => {
+  SAVE.testAll = true; SAVE.gold += 3000000; SAVE.gems += 5000;
+  const xp = ECON.xpNeed.reduce((a, b) => a + b, 0);
+  for (const f of FACTION_ORDER) for (const k of [FACTIONS[f].leader, ...FACTIONS[f].units]) { const u = uSave(k); u.xp = Math.max(u.xp || 0, xp); }
+  saveGame(); play('win'); updateWallets(); optButtons(); toast('Modo pruebas activado', true);
+});
+// pasar el progreso a otro móvil o PC con un código
+const saveCode = () => btoa(unescape(encodeURIComponent(JSON.stringify(SAVE))));
+$('#btn-export').onclick = () => {
+  const code = saveCode(), ta = $('#save-code'); ta.value = code; ta.select(); play('select');
+  const done = ok => toast(ok ? 'Código copiado. Pégalo en el otro dispositivo.' : 'Copia a mano el código de la caja', ok);
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(code).then(() => done(true), () => done(false)); else done(false);
+};
+$('#btn-import').onclick = () => {
+  let o = null; try { o = JSON.parse(decodeURIComponent(escape(atob($('#save-code').value.trim())))); } catch (e) { /* código mal copiado */ }
+  if (!o || o.v !== 1 || typeof o.stars !== 'object') { play('deny'); toast('Ese código no vale. Cópialo entero desde el otro dispositivo y pégalo en la caja.'); return; }
+  confirmBox('¿CARGAR ESE PROGRESO?', 'Se cambia todo tu progreso de este navegador por el del código.<small>No se puede deshacer.</small>', 'CARGAR', () => { SAVE = metaDefaults(o); saveGame(); location.reload(); });
+};
+$('#btn-opt-news').onclick = () => { play('select'); openNews(); };
+$('#btn-reset').onclick = () => confirmBox('¿EMPEZAR DE CERO?', 'Se borra <b>todo</b>: estrellas, oro, gemas, niveles y objetos.<small>No se puede deshacer.</small>', 'BORRAR', () => { try { localStorage.removeItem(SAVE_KEY); } catch (e) { /* sin almacenamiento */ } location.reload(); });
+
+/* ---------- instalar como app ---------- */
+let installEvt = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; });
+window.addEventListener('appinstalled', () => { installEvt = null; toast('¡Instalado! Ya lo tienes en tu pantalla de inicio', true); });
+const isStandalone = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+function installApp() {
+  play('select');
+  if (isStandalone()) { toast('Ya lo estás usando como app', true); return; }
+  if (installEvt) { const e = installEvt; installEvt = null; e.prompt(); return; }
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1), web = location.protocol === 'https:';
+  confirmBox('INSTALAR', (web ? '' : '<b>Ábrelo desde la web del juego</b> (no desde un archivo) para poder instalarlo.<br><br>')
+    + (ios ? 'En iPhone, con <b>Safari</b>: toca el botón <b>Compartir</b> (el cuadrado con la flecha hacia arriba) y luego <b>«Añadir a pantalla de inicio»</b>.'
+      : 'En Android, con <b>Chrome</b>: toca el menú <b>⋮</b> (arriba a la derecha) y luego <b>«Instalar aplicación»</b> o <b>«Añadir a pantalla de inicio»</b>.<br><br>En el PC, con Chrome o Edge: pulsa el icono de <b>instalar</b> que sale a la derecha de la barra de direcciones.')
+    + '<small>Se abre como una app: a pantalla completa, sin la barra del navegador, y también funciona sin conexión.</small>', null, null, 'ENTENDIDO');
+}
+$('#btn-install').onclick = installApp;
+// modo sin conexión: solo desde la web (en un archivo abierto a mano el navegador no lo permite)
+try { if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js?v=' + VERSION).catch(() => { /* sin modo sin conexión */ }); } catch (e) { /* el navegador no lo permite aquí */ }
