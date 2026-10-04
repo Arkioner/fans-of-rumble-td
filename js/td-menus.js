@@ -391,6 +391,11 @@ function toast(msg, good) { const t = $('#toast'); t.textContent = msg; t.classL
    Con cada versión nueva hay que subir VERSION (en td-meta.js) y poner aquí arriba del todo lo que cambia.
    ========================================================= */
 const NEWS = [
+  { v: '0.8.0', real: [
+      '<b>Opciones como las del original</b>: música del menú a elegir (la de cualquier raza o jefe), avisos encima o en una caja, chapas, sangre y chat.',
+      '<b>Chat en directo</b>: los comentarios falsos del original, durante la partida. Se quita en Opciones.',
+      '<b>Tutorial</b>: una partida guiada en el nivel 1-1 para quien empieza. Se puede repetir desde Opciones.'],
+    joke: ['El chat pregunta dónde se compra el CAOS. Microblizz está tomando nota.', 'La sangre es opcional. Los despidos, no.'] },
   { v: '0.7.0', real: [
       '<b>Opciones</b>: volumen, música, números de daño, temblor de pantalla y modo pruebas. Están en el menú principal.',
       '<b>Instalar</b>: desde Opciones puedes instalar el juego como una app, a pantalla completa. Instalado también funciona sin conexión.',

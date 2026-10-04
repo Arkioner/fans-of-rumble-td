@@ -15,8 +15,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Luckiest+Guy&display=swap">
-<link rel="stylesheet" href="css/td.css?v=0.7.0">
-<link rel="stylesheet" href="css/menus.css?v=0.7.0">
+<link rel="stylesheet" href="css/td.css?v=0.8.0">
+<link rel="stylesheet" href="css/menus.css?v=0.8.0">
 </head>
 <body>
 <div id="stage">
@@ -33,6 +33,9 @@
     <div id="banner" class="ol-big"></div>
     <button id="btn-wave" class="ol" hidden><span id="wave-main">¡OLEADA!</span><small id="wave-sub"></small></button>
     <button id="btn-mode" class="ol" hidden>ENVIAR UNIDADES</button>
+    <div id="chat" aria-hidden="true"></div>
+    <div id="feed" aria-hidden="true" hidden></div>
+    <div id="tut" role="status" hidden></div>
     <div id="panel" hidden></div>
     <div id="info" hidden></div>
     <footer id="tray" hidden><div id="cards"></div></footer>
@@ -108,12 +111,17 @@
       <div class="opt-list">
         <label class="opt-row"><span>Volumen</span><input type="range" id="opt-vol" min="0" max="100" step="5"></label>
         <label class="opt-row"><span><b>Música</b><br>Al mínimo, se quita.</span><input type="range" id="opt-mus" min="0" max="100" step="5"></label>
+        <div class="opt-row"><span><b>Música del menú</b><br>La canción que suena en la pantalla principal.</span><button class="btn-ghost ol" id="btn-menumus">ESPERA</button></div>
         <div class="opt-row"><span><b>Números de daño</b><br>Si los quitas, solo verás bajar las barras de vida.</span><button class="btn-ghost ol" id="btn-nums">SÍ</button></div>
-        <div class="opt-row"><span><b>Temblor de pantalla</b><br>La pantalla tiembla con los golpes a tu base, las explosiones y el salto de CrazyBunny.</span><button class="btn-ghost ol" id="btn-shake">SÍ</button></div>
-        <div class="opt-row"><span><b>Modo pruebas</b><br>Abre todos los mundos, da toda la experiencia hasta el nivel 10 (subir lo haces tú en la Colección), 3.000.000 de oro y 5.000 gemas.</span><button class="btn-ghost ol" id="btn-test">ACTIVAR</button></div>
+        <div class="opt-row"><span><b>Avisos de las unidades</b><br>«¡Chaos Jump!», «¡Despedido!», «¡Fusión!»…: encima de su cabeza o en una caja abajo a la derecha.</span><button class="btn-ghost ol" id="btn-feed">ENCIMA</button></div>
+        <div class="opt-row"><span><b>Chapas sobre las unidades</b><br>La llama de Rabia, el punto de la mutación y las estrellas de las unidades mejoradas.</span><button class="btn-ghost ol" id="btn-badges">SÍ</button></div>
+        <div class="opt-row"><span><b>Sangre</b><br>Al pegar sale una pequeña niebla roja (sin charcos).</span><button class="btn-ghost ol" id="btn-blood">NO</button></div>
+        <div class="opt-row"><span><b>Temblor de pantalla</b><br>La pantalla tiembla con los golpes fuertes, las explosiones y el salto de CrazyBunny.</span><button class="btn-ghost ol" id="btn-shake">SÍ</button></div>
+        <div class="opt-row"><span><b>Chat en directo</b><br>Los comentarios falsos durante la partida.</span><button class="btn-ghost ol" id="btn-chat">SÍ</button></div>
+        <div class="opt-row"><span><b>Modo pruebas</b><br>Desbloquea todos los mundos, da toda la experiencia hasta el nivel 10 (subir lo haces tú en la Colección), 3.000.000 de oro y 5.000 gemas.</span><button class="btn-ghost ol" id="btn-test">ACTIVAR</button></div>
         <div class="opt-row col"><span><b>Tu progreso</b> se guarda en este navegador. Para pasarlo a otro móvil o PC, copia el código y pégalo allí.</span><div class="row"><button class="btn-ghost ol" id="btn-export">COPIAR CÓDIGO</button><button class="btn-ghost ol" id="btn-import">CARGAR CÓDIGO</button></div><textarea id="save-code" rows="3" aria-label="Código de progreso" placeholder="Aquí aparece o se pega el código"></textarea></div>
-        <div class="opt-row"><span><b>Ayuda</b><br>Mira lo nuevo de esta versión.</span><button class="btn-ghost ol" id="btn-opt-news">NOVEDADES</button></div>
-        <div class="opt-row"><span><b>Instalar</b><br>Ábrelo como una app: a pantalla completa y sin la barra del navegador.</span><button class="btn-ghost ol" id="btn-install">INSTALAR</button></div>
+        <div class="opt-row col"><span><b>Ayuda</b><br>Mira lo nuevo de esta versión o vuelve a hacer la partida guiada.</span><div class="row"><button class="btn-ghost ol" id="btn-opt-news">NOVEDADES</button><button class="btn-ghost ol" id="btn-tut">TUTORIAL</button></div></div>
+        <div class="opt-row"><span><b>Instalar en el móvil</b><br>Ábrelo como una app: a pantalla completa y sin la barra del navegador.</span><button class="btn-ghost ol" id="btn-install">INSTALAR</button></div>
         <div class="opt-row"><span><b>Empezar de cero</b><br>Borra todo tu progreso.</span><button class="btn-ghost ol danger" id="btn-reset">BORRAR</button></div>
       </div>
       <p class="ver" id="opt-ver"></p>
@@ -171,18 +179,21 @@
   </div>
 </div>
 <!-- Arte y números del juego original (Fans of Rumble), sin cambios -->
-<script src="js/00-utils.js?v=0.7.0"></script>
-<script src="js/vendor/01-config.js?v=0.7.0"></script>
-<script src="js/vendor/03-arte.js?v=0.7.0"></script>
+<script src="js/00-utils.js?v=0.8.0"></script>
+<script src="js/vendor/01-config.js?v=0.8.0"></script>
+<script src="js/vendor/03-arte.js?v=0.8.0"></script>
 <!-- La defensa de torres -->
-<script src="js/td-data.js?v=0.7.0"></script>
-<script src="js/td-meta.js?v=0.7.0"></script>
-<script src="js/td-game.js?v=0.7.0"></script>
+<script src="js/td-data.js?v=0.8.0"></script>
+<script src="js/td-meta.js?v=0.8.0"></script>
+<script src="js/td-game.js?v=0.8.0"></script>
 <!-- Menús y horas extra: el código del original, adaptado a torre y unidad -->
-<script src="js/td-menus.js?v=0.7.0"></script>
-<script src="js/td-idle.js?v=0.7.0"></script>
+<script src="js/td-menus.js?v=0.8.0"></script>
+<script src="js/td-idle.js?v=0.8.0"></script>
 <!-- Música: las canciones del original y el motor con la paradoja de Shepard -->
-<script src="js/vendor/05-musica.js?v=0.7.0"></script>
-<script src="js/td-music.js?v=0.7.0"></script>
+<script src="js/vendor/05-musica.js?v=0.8.0"></script>
+<script src="js/td-music.js?v=0.8.0"></script>
+<!-- Chat, avisos y tutorial -->
+<script src="js/vendor/02-chat.js?v=0.8.0"></script>
+<script src="js/td-extras.js?v=0.8.0"></script>
 </body>
 </html>

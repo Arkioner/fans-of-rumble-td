@@ -8,7 +8,7 @@
      · UNIDAD (U): cuando la envías al rival en el modo VS o la pones a hacer horas extra.
    Casi todo lo que te equipas mejora solo una faceta, así que hay que elegir cuál prefieres.
    ========================================================= */
-const VERSION = '0.7.0';
+const VERSION = '0.8.0';
 const ECON = {
   lvlStep: 0.06, maxLvl: 10,                                                     // +6 % por nivel: daño de la torre y vida de la unidad
   xpNeed:   [0, 50, 100, 175, 300, 500, 800, 1300, 2000, 3200],                  // XP para pasar del nivel i al i+1

@@ -256,6 +256,7 @@ function hurt(f, dmg, crit) {
   if (f.sh > 0) { const a = Math.min(f.sh, dmg); f.sh -= a; dmg -= a; if (dmg <= 0) return; }
   if (f.U && f.U.pause && !f.paused && f.hp - dmg <= 0) { f.paused = true; f.invT = f.U.pause; pop(f.x, f.y - topOf(f) - 8, '¡PAUSA!', '#9fe8ff', 14); return; }
   f.hp -= dmg;
+  if (SAVE.blood) for (let i = 0; i < 3; i++) G.parts.push({ kind: 'dot', x: f.x + rand(-4, 4), y: f.y - topOf(f) * 0.5, vx: rand(-45, 45), vy: rand(-60, -10), g: 220, col: 'rgba(196,24,44,.85)', r: rand(1.8, 3), t: 0, life: rand(0.25, 0.45) });
   if ((crit || dmg >= 20) && SAVE.nums !== false) num(f.x + rand(-6, 6), f.y - topOf(f) - 6, Math.round(dmg), crit ? '#ffcb3d' : '#fff6ea', crit ? 18 : 13);
   if (f.hp <= 0) kill(f);
 }
@@ -555,7 +556,8 @@ function fuse(t) {
    EFECTOS
    ========================================================= */
 const num = (x, y, s, col, size = 14) => G.nums.push({ x, y, s: String(s), col, size, t: 0, life: 0.9 });
-const pop = (x, y, s, col, size = 18) => G.nums.push({ x, y, s, col, size, t: 0, life: 1.3, big: true });
+// los avisos («¡CHAOS JUMP!», «¡DESPEDIDO!»…) salen encima o, si lo eliges en Opciones, en la caja de abajo a la derecha
+const pop = (x, y, s, col, size = 18) => { if (SAVE.feed && G.screen === 'play' && (!G.vs || G.vsCur === G.vs.view)) feedAdd(s, col); else G.nums.push({ x, y, s, col, size, t: 0, life: 1.3, big: true }); };
 const ring = (x, y, r, col) => G.parts.push({ kind: 'ring', x, y, r, col, t: 0, life: 0.35 });
 const spark = (x, y, col) => G.parts.push({ kind: 'dot', x, y, col, r: 4, t: 0, life: 0.18 });
 const shake = n => { if (!REDUCED && SAVE.shake !== false) G.shake = Math.max(G.shake || 0, n); };
@@ -665,7 +667,7 @@ const SHOTS = { shadow: ['#9b6bff', 5], frost: ['#9fe8ff', 5], wave: ['#e6dcff',
 function drawTower(t) {
   const D = tdef(t), sc = tscale(t.k) * (t.mut.scale || 1);
   // RABIA: brillo naranja que crece con los aliados cercanos (como en el original)
-  if (t.rage > 0) { const k = t.rage / TD.rage.max, pulse = 0.85 + 0.15 * Math.sin(G.t * 8 + t.id), R = TOWER_R * (1.5 + k * 0.8); const g = ctx.createRadialGradient(t.x, t.y, 0, t.x, t.y, R); g.addColorStop(0, `rgba(255,120,40,${(0.25 + 0.4 * k) * pulse})`); g.addColorStop(1, 'rgba(255,60,20,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(t.x, t.y, R, R * 0.5, 0, 0, Math.PI * 2); ctx.fill(); }
+  if (t.rage > 0 && !SAVE.noBadges) { const k = t.rage / TD.rage.max, pulse = 0.85 + 0.15 * Math.sin(G.t * 8 + t.id), R = TOWER_R * (1.5 + k * 0.8); const g = ctx.createRadialGradient(t.x, t.y, 0, t.x, t.y, R); g.addColorStop(0, `rgba(255,120,40,${(0.25 + 0.4 * k) * pulse})`); g.addColorStop(1, 'rgba(255,60,20,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(t.x, t.y, R, R * 0.5, 0, 0, Math.PI * 2); ctx.fill(); }
   if (D.aura && t.stunT <= 0) { ctx.save(); ctx.globalAlpha = 0.3 + 0.1 * Math.sin(G.t * 3); ctx.strokeStyle = '#9ef07a'; ctx.lineWidth = 2; ctx.setLineDash([6, 6]); ctx.lineDashOffset = -G.t * 12; ctx.beginPath(); const ar = D.aura.r || rangeOf(t); ctx.ellipse(t.x, t.y, ar, ar * 0.92, 0, 0, Math.PI * 2); ctx.stroke(); ctx.restore(); }
   if (t.hasteT > 0) { ctx.save(); ctx.globalAlpha = 0.6; ctx.strokeStyle = '#ffcb3d'; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.ellipse(t.x, t.y, TOWER_R + 4, 10, 0, 0, Math.PI * 2); ctx.stroke(); ctx.restore(); }
   drawStump(t.x, t.y, t);
@@ -699,8 +701,8 @@ function drawFoe(f) {
   drawSpr(f.art, f.x + f.face * lg, f.y - z - (T.hover ? 4 + Math.sin(G.t * 4 + f.id) * 1.5 : 0), f.sc, f.face, { ang, walk: moving ? f.walk : null, flash: f.hitT > 0 ? (f.hitT / 0.12) * 0.9 : 0 });
   if (f.stunT > 0) for (let i = 0; i < 3; i++) { const a = G.t * 5 + i * 2.1; dot(ctx, f.x + Math.cos(a) * 12, f.y - topOf(f) - 6 + Math.sin(a) * 3, 2.2, '#ffcb3d'); }
   ctx.globalAlpha = 1;
-  if (f.mutCol) dot(ctx, f.x, f.y - topOf(f) - 3, 3.2, f.mutCol);
-  if (f.ulvl > 1) for (let i = 0; i < f.ulvl - 1; i++) { ctx.beginPath(); starPath(ctx, f.x + (i - (f.ulvl - 2) / 2) * 9, f.y - topOf(f) - 16, 4.6, 2); ctx.fillStyle = '#ffcb3d'; ctx.fill(); ctx.lineWidth = 1.2; ctx.strokeStyle = OL; ctx.stroke(); }
+  if (f.mutCol && !SAVE.noBadges) dot(ctx, f.x, f.y - topOf(f) - 3, 3.2, f.mutCol);
+  if (f.ulvl > 1 && !SAVE.noBadges) for (let i = 0; i < f.ulvl - 1; i++) { ctx.beginPath(); starPath(ctx, f.x + (i - (f.ulvl - 2) / 2) * 9, f.y - topOf(f) - 16, 4.6, 2); ctx.fillStyle = '#ffcb3d'; ctx.fill(); ctx.lineWidth = 1.2; ctx.strokeStyle = OL; ctx.stroke(); }
   if (f.sh > 0) { ctx.strokeStyle = 'rgba(95,227,255,.85)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(f.x, f.y - topOf(f) * 0.45, f.r * 1.25, topOf(f) * 0.62, 0, 0, Math.PI * 2); ctx.stroke(); }
   if (f.hp < f.maxHp && !FOES[f.k].boss) { const w = Math.max(24, f.r * 2.2), y = f.y - topOf(f) - 8; ctx.fillStyle = OL; ctx.fillRect(f.x - w / 2 - 1.5, y - 1.5, w + 3, 7); ctx.fillStyle = '#173d8f'; ctx.fillRect(f.x - w / 2, y, w, 4); ctx.fillStyle = '#2e8bff'; ctx.fillRect(f.x - w / 2, y, w * Math.max(0, f.hp / f.maxHp), 4); }
 }
