@@ -209,6 +209,7 @@ function ability(t, D) {
 }
 // el daño a la base: primero se come el escudo de plasma de los Ciberpunks
 function hitBase(d) {
+  if (G.vs) G.vs.stolen += d;
   G.shieldT = PASSIVES.ciber.delay;
   if (G.shield > 0) { const a = Math.min(G.shield, d); G.shield -= a; d -= a; }
   G.lives = Math.max(0, G.lives - d);
@@ -247,10 +248,11 @@ function kill(f) {
   const F = FOES[f.k], e = G.efac, E = ETRAITS[e];
   // RENACER: los No-Muertos se levantan una vez (los invocados por el jefe no)
   if (e === 'nomuertos' && !F.boss && !f.revived && !f.minion) { f.revived = true; f.hp = Math.round(f.maxHp * E.hpFrac); f.stunT = Math.max(f.stunT, E.delay); f.seen.clear(); pop(f.x, f.y - topOf(f) - 8, '¡RENACE!', '#b98cff', 14); burst(f.x, f.y - 10, ['#b98cff', '#e6dcff'], f.r); sfx('pop'); return; }
-  f.dead = true; G.gold += F.gold; G.kills++;
+  const gold = G.vs ? Math.ceil(F.gold * VS.bounty) : F.gold;
+  f.dead = true; G.gold += gold; G.kills++;
   // SECUELA: algunos de Cultura Pop vuelven en versión «2»
   if (e === 'pop' && !F.boss && !f.sequel && !f.minion && Math.random() < E.chance) { const g = spawnFoe(f.k, f, 1); g.hp = g.maxHp = Math.max(1, Math.round(f.maxHp * E.hp)); g.sc *= E.scale; g.sequel = true; pop(f.x, f.y - topOf(f) - 8, '¡LA SECUELA!', '#ffcb3d', 14); }
-  num(f.x, f.y - topOf(f) - 4, '+' + F.gold, '#ffcb3d', 13); burst(f.x, f.y - 10, ['#8fc2ff', '#2e8bff', '#fff6ea'], f.r);
+  num(f.x, f.y - topOf(f) - 4, '+' + gold, '#ffcb3d', 13); burst(f.x, f.y - 10, ['#8fc2ff', '#2e8bff', '#fff6ea'], f.r);
   if (F.eject) { for (let i = 0; i < F.ejectN; i++) spawnFoe(F.eject, f); pop(f.x, f.y - 40, '¡BOTÍN!', '#ffcb3d', 18); }
   if (F.boss) { G.boss = null; sfx('win'); shake(10); }
   sfx('pop');
@@ -292,9 +294,9 @@ function waveDone() {
 function update(dt) {
   G.t += dt;
   if (G.inWave) {
-    G.spawnT -= dt;
+    G.spawnT -= dt; if (G.vs && !G.spawnQ.length) G.spawnT = 0;
     while (G.spawnQ.length && G.spawnT <= 0) { const s = G.spawnQ.shift(); spawnFoe(s.k, null, FOES[s.k].boss ? G.level.hp : G.hpMul); G.spawnT += G.spawnQ.length ? G.spawnQ[0].gap : 0; }
-    if (!G.spawnQ.length && !G.foes.length) waveDone();
+    if (!G.vs && !G.spawnQ.length && !G.foes.length) waveDone();
   } else if (G.wave > 0 && G.wave < G.waves && !G.over) { G.nextT -= dt; if (G.nextT <= 0) { G.nextT = 0; startWave(); } }
   // enemigos
   for (const f of G.foes) {
@@ -396,10 +398,108 @@ function jumpStep(t, dt) {
 }
 function finish(win) {
   if (G.over) return; G.over = true; G.place = null; G.sel = null;
+  if (G.vs) { const w = G.vsCur === 'ai'; setTimeout(() => showVsResult(w), 800); return; }   // en VS gana quien tumba la base del otro
   const L = G.level, st = win ? (G.lives >= TD.baseHp * 0.9 ? 3 : G.lives >= TD.baseHp / 2 ? 2 : 1) : 0;
   const first = win && !starsOf(L.id);
   if (win && st > starsOf(L.id)) { SAVE.stars[L.id] = st; saveGame(); }
   setTimeout(() => showResult(win, st, first), win ? 900 : 600);
+}
+
+/* =========================================================
+   MODO VS: tú contra un rival que lleva el juego. Cada uno defiende su campo y manda unidades al del otro.
+   Los dos campos usan el mismo motor: el estado de un campo se guarda y se carga en G para simularlo o dibujarlo.
+   ========================================================= */
+const BOARD_F = ['gold', 'lives', 'foes', 'towers', 'projs', 'parts', 'nums', 'spawnQ', 'spawnT', 'route', 'kills', 'fac', 'efac', 'shield', 'shieldT', 'denHitT', 'denT', 'boss', 'teamDmg', 'teamSpd', 'shake', 'hpMul'];
+function saveBoard(B) { for (const k of BOARD_F) B[k] = G[k]; B.block.set(BLOCK); B.dist = DIST; }
+function loadBoard(B, who) { for (const k of BOARD_F) G[k] = B[k]; BLOCK.set(B.block); DIST = B.dist; G.vsCur = who; }
+// fac: la raza que defiende ese campo · efac: la raza de las unidades que le llegan (la del otro jugador)
+const newBoard = (fac, efac) => ({ gold: VS.gold, lives: TD.baseHp, foes: [], towers: [], projs: [], parts: [], nums: [], spawnQ: [], spawnT: 0, route: [], kills: 0, fac, efac, shield: fac === 'ciber' ? PASSIVES.ciber.amt : 0, shieldT: 0, denHitT: 0, denT: 0,
+  boss: null, teamDmg: 1, teamSpd: 0, shake: 0, hpMul: 1, block: new Uint8Array(NCELL), dist: null, income: VS.income, sent: 0 });
+const VS_LEVEL = { id: 'VS', name: 'Modo VS', hp: 1, growth: 0, bud: 1 };
+const sendCost = k => Math.max(10, Math.round(FOES[k].cost * VS.sendCost / 5) * 5);
+const sendIncome = k => Math.max(1, Math.round(sendCost(k) * VS.incomeRate));
+function startVS(diff) {
+  const fac = facNow(), rival = pick(FACTION_ORDER.filter(f => f !== fac && TOWERS[f]));
+  const me = newBoard(fac, rival), ai = newBoard(rival, fac);
+  // el rival planea un laberinto en serpentina
+  const plan = []; [2, 5, 8, 11].forEach((r, ri) => { const cols = []; for (let c = 0; c < COLS; c++) if (ri % 2 ? c !== 0 : c !== COLS - 1) cols.push(c); cols.sort((a, b) => Math.abs(a - 7) - Math.abs(b - 7)); cols.forEach(c => plan.push([c, r])); });
+  Object.assign(G, { screen: 'play', level: VS_LEVEL, wave: 1, waves: 1, inWave: true, nextT: 0, place: null, ghost: null, sel: null, over: false, paused: false, trayMode: 'build' });
+  G.vs = { me, ai, view: 'me', t: 0, tickT: VS.tick, stolen: 0, diff, aiT: 1.5, plan, pi: 0, n: 0, def: 0, snd: 0, defDone: false };
+  loadBoard(ai, 'ai'); reflow(); saveBoard(ai); loadBoard(me, 'me'); reflow();
+  BG = bgOf(fac); hidePanel(); showScreen(null); buildTray(); hud();
+  banner('VS ' + FACTIONS[rival].name.toUpperCase());
+}
+// un paso de la partida: tu campo, luego el del rival
+function vsUpdate(dt) {
+  const V = G.vs; V.t += dt; const hp = Math.pow(2, V.t / VS.hpDouble);
+  V.tickT -= dt;
+  if (V.tickT <= 0) { V.tickT += VS.tick; G.gold += V.me.income; V.ai.gold += Math.round(V.ai.income * VS.ai[V.diff]); num(70, 96, '+' + V.me.income + ' de income', '#ffcb3d', 15); if (V.view === 'me') sfx('coin'); }
+  G.hpMul = hp; update(dt); vsSteal(V.ai);
+  if (G.over) return;
+  saveBoard(V.me); loadBoard(V.ai, 'ai');
+  G.hpMul = hp; V.aiT -= dt; if (V.aiT <= 0) { V.aiT = 0.8; aiThink(); }
+  update(dt); G.t -= dt; vsSteal(V.me);
+  saveBoard(V.ai); loadBoard(V.me, 'me');
+}
+// lo que tus unidades le quitan a la base rival se lo queda la tuya (y al revés)
+function vsSteal(to) { const V = G.vs; if (V.stolen > 0) { to.lives = Math.min(VS.maxHp, to.lives + V.stolen * VS.steal); V.stolen = 0; } }
+function vsSend(k) {
+  const V = G.vs, c = sendCost(k); if (G.over || G.gold < c) return false;
+  if (V.ai.spawnQ.length >= VS.queue) { num(270, 720, 'COLA LLENA', '#ff4b5c', 14); return false; }
+  G.gold -= c; V.me.income += sendIncome(k); V.me.sent++; V.ai.spawnQ.push({ k, gap: VS.gap });
+  num(270, 720, '+' + sendIncome(k) + ' income', '#ffcb3d', 14); sfx('horn'); return true;
+}
+// el rival: reparte su oro entre defenderse y mandarte unidades
+function aiThink() {
+  const V = G.vs, fac = G.fac, ks = Object.keys(TOWERS[fac]), lead = ks[0], rest = ks.slice(1), cheap = rest[0];
+  for (let guard = 0; guard < 6; guard++) {
+    const threat = G.foes.length > 8 || G.lives < TD.baseHp * 0.7;
+    const early = V.t < VS.aiGrace || V.n < 6;   // al principio solo se defiende, para que te dé tiempo a montar algo
+    if (!V.defDone && (early || threat || V.def <= V.snd * VS.aiDef)) {
+      if (V.pi < V.plan.length) {
+        let k = V.n === 5 ? lead : V.n < 4 ? cheap : rest[(V.n * 7 + 3) % rest.length];
+        if (G.gold < TOWERS[fac][k].cost) { if (G.gold >= TOWERS[fac][cheap].cost) k = cheap; else return; }
+        const [c, r] = V.plan[V.pi], why = whyNot(c, r);
+        if (!why && build(k, c, r)) { V.pi++; V.n++; V.def += TOWERS[fac][k].cost; } else if (why && why !== 'enemigo') V.pi++; else return;
+      } else {
+        const t = G.towers.filter(o => o.lvl < TD.maxLevel).sort((a, b) => a.lvl - b.lvl)[0]; if (!t) { V.defDone = true; continue; }
+        const c = upCost(t); if (G.gold < c) return; upgrade(t); V.def += c;
+      }
+    } else {
+      const opts = FACTIONS[fac].units.filter(k => sendCost(k) <= G.gold).sort((a, b) => sendCost(b) - sendCost(a)); if (!opts.length) return;
+      if (early || V.me.spawnQ.length >= VS.queue) return;
+      const k = opts[(Math.random() * Math.min(3, opts.length)) | 0], c = sendCost(k);
+      G.gold -= c; V.ai.income += sendIncome(k); V.ai.sent++; V.snd += c; V.me.spawnQ.push({ k, gap: VS.gap });
+    }
+  }
+}
+function vsView(v) {
+  const V = G.vs; V.view = v; G.place = null; G.ghost = null; G.sel = null; hidePanel(); hud();
+}
+function showVsResult(win) {
+  const V = G.vs; G.screen = 'result'; showScreen('scr-result');
+  $('#res-title').textContent = win ? '¡VICTORIA!' : FACTIONS[V.me.fac].base + ' HA CAÍDO';
+  $('#res-title').className = 'ol-big ' + (win ? 'win' : 'lose');
+  $('#res-stars').innerHTML = '';
+  const m = Math.floor(V.t / 60), s = String(Math.floor(V.t % 60)).padStart(2, '0');
+  $('#res-msg').innerHTML = (win ? `Has tumbado la base de ${FAC_NAME(V.ai.fac)} en ${m}:${s}.` : `${capFirst(FAC_NAME(V.ai.fac))} han tumbado tu base en ${m}:${s}.`) + `<br>Enviaste ${V.me.sent} unidades y tu income llegó a ${V.me.income}. El rival envió ${V.ai.sent}.`;
+  const art = $('#res-art'); requestAnimationFrame(() => portrait(art, FACTIONS[win ? V.me.fac : V.ai.fac].leader, 120));
+  $('#res-next').hidden = true; $('#res-retry').onclick = () => startVS(V.diff);
+}
+
+/* ---------- fusión de torres en contacto ---------- */
+// dos torres iguales, del mismo nivel y pegadas (arriba, abajo o a los lados) se pueden fusionar en una de un nivel más
+function fuseMate(t) {
+  if (t.lvl >= TD.fuseMax || tdef(t).leader) return null;
+  const c = t.cell % COLS, r = (t.cell / COLS) | 0;
+  for (const [dc, dr] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nc = c + dc, nr = r + dr; if (nc < 0 || nr < 0 || nc >= COLS || nr >= ROWS) continue; const o = G.towers.find(o => o.cell === idx(nc, nr)); if (o && o.k === t.k && o.lvl === t.lvl && o.fac === t.fac) return o; }
+  return null;
+}
+function fuse(t) {
+  const o = fuseMate(t); if (!o) return;
+  G.towers = G.towers.filter(x => x !== o); BLOCK[o.cell] = 0; reflow();
+  t.lvl++; t.spent += o.spent; t.dropT = 0.2;
+  puff(o.x, o.y, '#d9b77e', 12); ring(t.x, t.y, 46, 'rgba(197,140,255,.95)'); burst(t.x, t.y - 20, ['#c58cff', '#ffcb3d', '#fff6ea'], 18); pop(t.x, t.y - 54, '¡FUSIÓN! NIVEL ' + t.lvl, '#c58cff', 16); sfx('up');
 }
 
 /* =========================================================
@@ -422,6 +522,7 @@ function banner(s) { const b = $('#banner'); b.textContent = s; b.classList.remo
 let AC = null;
 function sfx(k) {
   if (SAVE.muted) return;
+  if (G.vs && G.screen === 'play' && G.vsCur !== G.vs.view) return;   // en VS solo suena el campo que estás mirando
   try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
   if (AC.state === 'suspended') AC.resume();
   const S = { shot: [880, 660, 0.05, 'square', 0.03], hit: [300, 160, 0.07, 'square', 0.05], crit: [520, 900, 0.12, 'sawtooth', 0.06], lob: [300, 520, 0.12, 'triangle', 0.05], boom: [140, 40, 0.3, 'sawtooth', 0.09],
@@ -497,7 +598,7 @@ function drawStump(x, y, t) {
   ctx.beginPath(); ctx.ellipse(x, y + 2, TOWER_R, 7.5, 0, 0, Math.PI); ctx.lineTo(x - TOWER_R, y - 3); ctx.closePath(); ctx.fillStyle = '#7a4d1c'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = OL; ctx.stroke();
   ctx.beginPath(); ctx.ellipse(x, y - 3, TOWER_R, 7.5, 0, 0, Math.PI * 2); ctx.fillStyle = '#d9a35e'; ctx.fill(); ctx.stroke();
   ctx.beginPath(); ctx.ellipse(x, y - 3, TOWER_R * 0.55, 4, 0, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(122,77,28,.6)'; ctx.lineWidth = 1.2; ctx.stroke();
-  if (t && t.lvl > 1) for (let i = 0; i < t.lvl - 1; i++) { ctx.save(); ctx.translate(x - 7 + i * 14, y + 7); ctx.beginPath(); starPath(ctx, 0, 0, 5.5, 2.4); ctx.fillStyle = '#ffcb3d'; ctx.fill(); ctx.lineWidth = 1.4; ctx.strokeStyle = OL; ctx.stroke(); ctx.restore(); }
+  if (t && t.lvl > 1) for (let i = 0; i < t.lvl - 1; i++) { ctx.save(); ctx.translate(x + (i - (t.lvl - 2) / 2) * (t.lvl > 3 ? 9 : 14), y + 7); ctx.beginPath(); starPath(ctx, 0, 0, 5.5, 2.4); ctx.fillStyle = '#ffcb3d'; ctx.fill(); ctx.lineWidth = 1.4; ctx.strokeStyle = OL; ctx.stroke(); ctx.restore(); }
 }
 const TSCALE = { bunny: 0.82, mechavaca: 0.82, junkcoon: 0.95 };
 const tscale = k => TSCALE[k] || (CFG.units[k].r >= 21 ? 0.8 : CFG.units[k].r >= 18 ? 0.86 : 1);
@@ -571,10 +672,15 @@ function drawProj(p) {
   if (p.kind === 'letter') { const k = Math.min(1, p.t / p.dur); p.x = lerp(p.x, p.tx, k * 0.25); p.y = lerp(p.y, p.ty, k * 0.25); }
 }
 function draw() {
+  const V = G.vs;
+  if (V && G.screen === 'play' && V.view === 'ai') { saveBoard(V.me); loadBoard(V.ai, 'ai'); drawBoard(); loadBoard(V.me, 'me'); }
+  else drawBoard();
+}
+function drawBoard() {
   ctx.setTransform(SCALE * DPR, 0, 0, SCALE * DPR, 0, 0);
   if (G.screen !== 'play' || !BG) { ctx.fillStyle = '#150b21'; ctx.fillRect(0, 0, W, H); if (BG) ctx.drawImage(BG, 0, 0, W, H); return; }
   const sh = G.shake || 0; if (sh) ctx.translate(rand(-sh, sh) * 0.4, rand(-sh, sh) * 0.4);
-  ctx.drawImage(BG, 0, 0, W, H);
+  ctx.drawImage(G.vs ? bgOf(G.fac) : BG, 0, 0, W, H);
   // la sede de Microblizz arriba y La Madriguera abajo (arte del original)
   drawSpr(FACTIONS[G.efac].skin + '_base', HQ.x, HQ.y - 6, 0.62, 1);
   // mientras eliges dónde poner una torre: las casillas, la casilla elegida y cómo quedaría el camino
@@ -614,7 +720,7 @@ function draw() {
 function drawDen() {
   drawSpr(FACTIONS[G.fac].skin + '_base', DEN.x, DEN.y + 14, 0.72, 1, { flash: G.denHitT > 0 ? G.denHitT * 3 : 0 });
   // vida de La Madriguera
-  const w = 120, x = DEN.x - w / 2, y = DEN.y + 22, k = G.lives / TD.baseHp;
+  const w = 120, x = DEN.x - w / 2, y = DEN.y + 22, k = Math.min(1, G.lives / TD.baseHp);
   ctx.fillStyle = OL; ctx.fillRect(x - 2, y - 2, w + 4, 11); ctx.fillStyle = '#4a1020'; ctx.fillRect(x, y, w, 7);
   ctx.fillStyle = k > 0.5 ? '#6fd36a' : k > 0.25 ? '#ffcb3d' : '#ff4b5c'; ctx.fillRect(x, y, w * k, 7);
   if (G.fac === 'ciber') { ctx.fillStyle = OL; ctx.fillRect(x - 2, y - 9, w + 4, 8); ctx.fillStyle = '#123a52'; ctx.fillRect(x, y - 7, w, 4); ctx.fillStyle = '#5fe3ff'; ctx.fillRect(x, y - 7, w * (G.shield / PASSIVES.ciber.amt), 4); }
@@ -630,7 +736,7 @@ function drawRoute(route, col) {
    INTERFAZ
    ========================================================= */
 const $ = s => document.querySelector(s);
-function showScreen(id) { for (const s of document.querySelectorAll('.screen')) s.hidden = s.id !== id; $('#hud').hidden = $('#tray').hidden = id !== null; }
+function showScreen(id) { if (id !== null) $('#btn-mode').hidden = true; for (const s of document.querySelectorAll('.screen')) s.hidden = s.id !== id; $('#hud').hidden = $('#tray').hidden = id !== null; }
 function portrait(cnv, key, h, flip = 1) {
   const k = 3; cnv.width = cnv.clientWidth * k || 180; cnv.height = cnv.clientHeight * k || 180;
   const c = cnv.getContext('2d'); c.scale(k, k); const cw = cnv.width / k, ch = cnv.height / k;
@@ -638,23 +744,44 @@ function portrait(cnv, key, h, flip = 1) {
 }
 function buildTray() {
   const tray = $('#cards'); tray.innerHTML = '';
+  if (G.vs && G.trayMode === 'send') {
+    // modo VS: las 6 unidades de tu raza, para mandárselas al rival
+    for (const k of FACTIONS[G.fac].units) {
+      const C = CFG.cards[k], b = document.createElement('button'); b.className = 'card r-' + C.rarity; b.dataset.k = k; b.dataset.send = '1'; b.setAttribute('aria-label', `Enviar ${C.name}: ${sendCost(k)} de oro, +${sendIncome(k)} de income`);
+      b.innerHTML = `<canvas></canvas><span class="nm">+${sendIncome(k)} income</span><span class="cost ol">${sendCost(k)}</span>`;
+      tray.appendChild(b); requestAnimationFrame(() => portrait(b.querySelector('canvas'), k, C.rarity === 'epic' ? 40 : 34));
+      b.addEventListener('pointerdown', e => { e.preventDefault(); vsSend(k); hud(); });
+    }
+    return;
+  }
   for (const k in TOWERS[G.fac]) {
     const D = TOWERS[G.fac][k], C = CFG.cards[k];
     const b = document.createElement('button'); b.className = 'card r-' + C.rarity; b.dataset.k = k; b.setAttribute('aria-label', `${C.name}, ${D.cost} de oro`);
     b.innerHTML = `<canvas></canvas><span class="nm">${C.name}</span><span class="cost ol">${D.cost}</span>`;
     tray.appendChild(b);
     requestAnimationFrame(() => portrait(b.querySelector('canvas'), k, C.rarity === 'leader' || C.rarity === 'epic' ? 40 : 34));
-    b.addEventListener('pointerdown', e => { e.preventDefault(); G.sel = null; hidePanel(); if (G.over) return; if (D.leader && G.towers.some(t => t.k === k)) { showInfo(k); return; } if (G.place === k) { G.place = null; G.ghost = null; } else { G.place = k; G.ghost = null; G.dragging = true; showInfo(k); } refreshTray(); });
+    b.addEventListener('pointerdown', e => { e.preventDefault(); if (G.vs && G.vs.view !== 'me') vsView('me'); G.sel = null; hidePanel(); if (G.over) return; if (D.leader && G.towers.some(t => t.k === k)) { showInfo(k); return; } if (G.place === k) { G.place = null; G.ghost = null; } else { G.place = k; G.ghost = null; G.dragging = true; showInfo(k); } refreshTray(); });
   }
 }
 function showInfo(k) { const C = CFG.cards[k], D = TOWERS[G.fac][k]; $('#info').innerHTML = `<b>${C.name}</b> · ${D.desc}`; $('#info').hidden = false; }
 function refreshTray() {
-  for (const b of document.querySelectorAll('#cards .card')) { const k = b.dataset.k, D = TOWERS[G.fac][k]; const used = D.leader && G.towers.some(t => t.k === k); b.classList.toggle('off', G.gold < D.cost || used); b.classList.toggle('sel', G.place === k); b.classList.toggle('used', !!used); }
+  for (const b of document.querySelectorAll('#cards .card')) { const k = b.dataset.k; if (b.dataset.send) { b.classList.toggle('off', G.gold < sendCost(k)); continue; } const D = TOWERS[G.fac][k]; const used = D.leader && G.towers.some(t => t.k === k); b.classList.toggle('off', G.gold < D.cost || used); b.classList.toggle('sel', G.place === k); b.classList.toggle('used', !!used); }
   if (!G.place) $('#info').hidden = true;
 }
 function hud() {
-  $('#gold').textContent = G.gold; $('#lives').textContent = G.lives; $('#wave').textContent = `${Math.min(G.wave, G.waves)}/${G.waves}`;
-  const wb = $('#btn-wave'), can = !G.inWave && G.wave < G.waves && !G.over; wb.hidden = !can;
+  const V = G.vs, wb = $('#btn-wave');
+  $('#gold').textContent = G.gold; $('#lives').textContent = Math.ceil(G.lives); $('#ui').classList.toggle('vs', !!V); $('#btn-mode').hidden = !V;
+  if (V) {
+    // modo VS: la vida del rival, tu income y el botón para mirar su campo
+    $('#wave-l').textContent = 'RIVAL ♥'; $('#wave').textContent = Math.ceil(V.ai.lives);
+    wb.hidden = G.over; $('#wave-main').textContent = V.view === 'me' ? 'RIVAL' : 'VOLVER'; $('#wave-sub').textContent = V.view === 'me' ? 'ver su campo' : 'a tu campo';
+    $('#btn-mode').textContent = G.trayMode === 'send' ? 'TORRES' : 'ENVIAR UNIDADES';
+    $('#btn-speed').textContent = 'x' + G.speed; $('#btn-speed').setAttribute('aria-pressed', String(G.speed > 1));
+    $('#lvl-name').textContent = (V.view === 'me' ? 'TU CAMPO' : 'CAMPO DE ' + FAC_NAME(V.ai.fac).toUpperCase()) + ` · income +${V.me.income} en ${Math.ceil(V.tickT)} s`;
+    refreshTray(); if (G.sel) placePanel(); return;
+  }
+  $('#wave-l').textContent = 'OLEADA'; $('#wave-main').textContent = '¡OLEADA!'; $('#wave').textContent = `${Math.min(G.wave, G.waves)}/${G.waves}`;
+  const can = !G.inWave && G.wave < G.waves && !G.over; wb.hidden = !can;
   if (can) $('#wave-sub').textContent = G.wave === 0 ? '¡EMPEZAR!' : Math.ceil(G.nextT) + ' s · +' + Math.round(G.nextT * TD.earlyBonus);
   $('#btn-speed').textContent = 'x' + G.speed; $('#btn-speed').setAttribute('aria-pressed', String(G.speed > 1));
   $('#lvl-name').textContent = `${G.level.id} · ${G.level.name}` + passiveChip();
@@ -670,12 +797,12 @@ function passiveChip() {
   return ' · ' + FACTIONS[f].passive;
 }
 function placePanel() {
-  const t = G.sel, p = $('#panel'), C = CFG.cards[t.k], D = tdef(t), max = t.lvl >= TD.maxLevel, c = upCost(t);
+  const t = G.sel, p = $('#panel'), C = CFG.cards[t.k], D = tdef(t), max = t.lvl >= TD.maxLevel, c = max ? 0 : upCost(t), mate = fuseMate(t), canFuse = t.lvl < TD.fuseMax && !D.leader;
   p.hidden = false;
   const R = Math.round(rangeOf(t)), dmg = D.kind === 'aura' ? `+${Math.round((D.aura.speed + 0.1 * (t.lvl - 1)) * 100)} % velocidad` : `${Math.round(dmgOf(t))} de daño`;
-  const html = `<div class="pn-t ol">${C.name} <small>NV ${t.lvl}</small></div><div class="pn-s">${dmg} · alcance ${R}${t.rage ? ` · <span class="rage">RABIA +${t.rage * 10} %</span>` : ''}${t.mut.id && t.mut.id !== 'normal' ? ` · <span class="rage">${t.mut.txt}</span>` : ''}</div>
-    <div class="pn-b"><button class="btn-up" id="pn-up" ${max || G.gold < c ? 'disabled' : ''}>${max ? 'MÁXIMO' : 'MEJORAR<small>' + c + ' oro</small>'}</button><button class="btn-sell" id="pn-sell">VENDER<small>+${sellOf(t)}</small></button></div>`;
-  if (p.dataset.h !== html) { p.innerHTML = html; p.dataset.h = html; $('#pn-up').onclick = () => { upgrade(t); hud(); }; $('#pn-sell').onclick = () => { sell(t); hidePanel(); hud(); }; }
+  const html = `<div class="pn-t ol">${C.name} <small>NV ${t.lvl}</small></div><div class="pn-s">${dmg} · alcance ${R}${t.rage ? ` · <span class="rage">RABIA +${t.rage * 10} %</span>` : ''}${t.mut.id && t.mut.id !== 'normal' ? ` · <span class="rage">${t.mut.txt}</span>` : ''}</div>${canFuse && !mate ? '<div class="pn-h">Pega al lado otra igual y del mismo nivel para fusionarlas.</div>' : ''}
+    <div class="pn-b"><button class="btn-up" id="pn-up" ${max || G.gold < c ? 'disabled' : ''}>${max ? 'MÁXIMO' : 'MEJORAR<small>' + c + ' oro</small>'}</button>${mate ? `<button class="btn-fuse" id="pn-fuse">FUSIONAR<small>nivel ${t.lvl + 1}</small></button>` : ''}<button class="btn-sell" id="pn-sell">VENDER<small>+${sellOf(t)}</small></button></div>`;
+  if (p.dataset.h !== html) { p.innerHTML = html; p.dataset.h = html; $('#pn-up').onclick = () => { upgrade(t); hud(); }; $('#pn-sell').onclick = () => { sell(t); hidePanel(); hud(); }; const pf = $('#pn-fuse'); if (pf) pf.onclick = () => { fuse(t); hud(); }; }
   const x = clamp(t.x, 120, W - 120), y = t.y > 520 ? t.y - 160 : t.y + 40; p.style.left = x - 110 + 'px'; p.style.top = y + 'px';
 }
 function hidePanel() { $('#panel').hidden = true; $('#panel').dataset.h = ''; }
@@ -706,7 +833,7 @@ addEventListener('pointerup', e => {
   const p = toField(e); if (G.place && p.y < 792 && p.y > 0 && G.ghost) { tryBuild(ghostAt(p)); hud(); }
 });
 cv.addEventListener('pointerdown', e => {
-  if (G.screen !== 'play' || G.over) return; const p = toField(e);
+  if (G.screen !== 'play' || G.over || (G.vs && G.vs.view !== 'me')) return; const p = toField(e);
   if (G.place) { const g = ghostAt(p); if (g) { G.ghost = g; tryBuild(g); hud(); } return; }
   const pc = p.y >= GY && p.y < GY1 ? cellOf(p.x, p.y) : -1;
   const t = G.towers.find(o => o.cell === pc) || G.towers.find(o => Math.hypot(o.x - p.x, o.y - 20 - p.y) < 22);
@@ -715,6 +842,7 @@ cv.addEventListener('pointerdown', e => {
 addEventListener('keydown', e => { if (e.key === 'Escape') { G.place = null; G.ghost = null; G.sel = null; hidePanel(); refreshTray(); } if (e.key === ' ' && G.screen === 'play') { e.preventDefault(); startWave(); } });
 
 function startLevel(L) {
+  G.vs = null;
   Object.assign(G, { screen: 'play', level: L, gold: L.gold, lives: TD.baseHp, route: [], wave: 0, waves: L.waves, inWave: false, nextT: 0, spawnQ: [], foes: [], towers: [], projs: [], parts: [], nums: [], place: null, ghost: null, sel: null, over: false, paused: false, boss: null, kills: 0, hpMul: L.hp, fac: facNow(), efac: L.efac, teamDmg: 1, teamSpd: 0, shieldT: 0, denHitT: 0, denT: 0 });
   G.shield = G.fac === 'ciber' ? PASSIVES.ciber.amt : 0; BG = bgOf(G.fac);
   BLOCK.fill(0); reflow();
@@ -737,6 +865,7 @@ function showResult(win, st, first) {
 }
 const FAC_NAME = f => (f && FACTIONS[f] ? (FACTIONS[f].los || 'los ' + FACTIONS[f].name) : '');
 function showMap() {
+  G.vs = null;
   G.screen = 'map'; showScreen('scr-map');
   const list = $('#worlds'); buildFacPick();
   list.innerHTML = WORLDS_TD.map((w, wi) => {
@@ -761,11 +890,13 @@ function buildFacPick() {
 
 /* ---------- botones ---------- */
 $('#btn-play').onclick = () => { sfx('place'); showMap(); };
-$('#btn-wave').onclick = () => { startWave(); hud(); };
+$('#btn-wave').onclick = () => { if (G.vs) vsView(G.vs.view === 'me' ? 'ai' : 'me'); else { startWave(); hud(); } };
+$('#btn-mode').onclick = () => { if (G.vs.view !== 'me') vsView('me'); G.trayMode = G.trayMode === 'send' ? 'build' : 'send'; G.place = null; G.ghost = null; buildTray(); hud(); };
+for (const b of document.querySelectorAll('#vs-row button')) b.onclick = () => { sfx('place'); startVS(b.dataset.d); };
 $('#btn-speed').onclick = () => { G.speed = G.speed === 1 ? 2 : 1; hud(); };
 $('#btn-pause').onclick = () => { if (G.over) return; G.paused = true; $('#scr-pause').hidden = false; };
 $('#pz-go').onclick = () => { G.paused = false; $('#scr-pause').hidden = true; };
-$('#pz-retry').onclick = () => { $('#scr-pause').hidden = true; startLevel(G.level); };
+$('#pz-retry').onclick = () => { $('#scr-pause').hidden = true; if (G.vs) startVS(G.vs.diff); else startLevel(G.level); };
 $('#pz-map').onclick = () => { $('#scr-pause').hidden = true; G.paused = false; showMap(); };
 $('#res-map').onclick = () => showMap();
 $('#map-back').onclick = () => { G.screen = 'title'; showScreen('scr-title'); };
@@ -776,7 +907,7 @@ for (const b of document.querySelectorAll('.btn-sound')) b.onclick = () => { SAV
 let last = performance.now(), hudT = 0;
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  if (G.screen === 'play' && !G.paused && !G.over) { const steps = G.speed; for (let i = 0; i < steps; i++) update(dt); }
+  if (G.screen === 'play' && !G.paused && !G.over) { const steps = G.speed; for (let i = 0; i < steps && !G.over; i++) (G.vs ? vsUpdate : update)(dt); }
   else if (G.screen === 'play' && G.over) { const d2 = dt; for (const q of G.parts) { q.t += d2; } G.parts = G.parts.filter(q => q.t < q.life); for (const n of G.nums) { n.t += d2; n.y -= d2 * 28; } G.nums = G.nums.filter(n => n.t < n.life); }
   draw();
   hudT -= dt; if (G.screen === 'play' && hudT <= 0) { hudT = 0.1; hud(); }
@@ -788,7 +919,7 @@ async function boot() {
   fit(); addEventListener('resize', fit); soundBtns();
   showScreen('scr-title');
   portrait($('#title-art'), 'bunny', 150); portrait($('#title-foe'), 'fallen', 110, -1);
-  window.__TD = { G, TOWERS, startLevel, startWave, build, sell, upgrade, update, canPlace, whyNot, flow, BLOCK, ENTRY, WORLDS_TD, SAVE, get DIST() { return DIST; } };   // para las pruebas automáticas
+  window.__TD = { G, TOWERS, startVS, vsUpdate, vsSend, vsView, fuse, fuseMate, startLevel, startWave, build, sell, upgrade, update, canPlace, whyNot, flow, BLOCK, ENTRY, WORLDS_TD, SAVE, get DIST() { return DIST; } };   // para las pruebas automáticas
   requestAnimationFrame(frame);
 }
 boot();

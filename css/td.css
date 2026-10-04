@@ -107,6 +107,14 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 #map-team { font-weight: 800; font-size: 15px; margin: 10px 0 8px; color: var(--ink-dim); align-self: flex-start; }
 .wt { font-size: 12px; line-height: 1.25; font-weight: 600; margin: 6px 0 2px; color: var(--ink-dim); }
 .wt b { color: var(--ink); }
+#vs-row { display: flex; align-items: center; gap: 8px; width: 100%; margin: 0 0 12px; }
+#vs-row span { font-family: var(--font-display); font-size: 19px; color: var(--gold); margin-right: auto; }
+#vs-row .btn-ghost { font-size: 15px; padding: 9px 12px 5px; border-radius: 12px; box-shadow: 0 3px 0 var(--outline); }
+#btn-mode { position: absolute; left: 10px; bottom: 176px; font-family: var(--font-display); font-size: 16px; line-height: 1; padding: 10px 14px 6px; border-radius: 12px; border: 3px solid var(--outline); background: linear-gradient(to bottom, #ffb04f, #cf5a16); color: var(--ink); cursor: pointer; box-shadow: 0 4px 0 var(--outline); }
+#ui.vs #info { bottom: 224px; }
+.btn-fuse { flex: 1; font-family: var(--font-display); font-size: 15px; line-height: 1.05; padding: 8px 6px 4px; border-radius: 11px; border: 3px solid var(--outline); cursor: pointer; box-shadow: 0 3px 0 var(--outline); background: linear-gradient(to bottom, #d9a8ff, #7a35c9); }
+.btn-fuse small { display: block; font-family: var(--font-ui); font-weight: 800; font-size: 12px; }
+.pn-h { font-size: 11.5px; line-height: 1.2; font-weight: 600; color: var(--ink-dim); margin: 0 0 6px; }
 #fac-pick { display: grid; grid-template-columns: repeat(9, 1fr); gap: 5px; width: 100%; }
 .fac { padding: 0; border: 3px solid var(--outline); border-radius: 12px; background: var(--tray-hi); cursor: pointer; box-shadow: 0 3px 0 var(--outline); overflow: hidden; }
 .fac canvas { width: 100%; height: 50px; display: block; pointer-events: none; }

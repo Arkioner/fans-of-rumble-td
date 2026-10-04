@@ -20,12 +20,13 @@
       <button class="icon-btn" id="btn-pause" aria-label="Pausar"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="5" height="16" rx="1.5" fill="currentColor"/><rect x="14" y="4" width="5" height="16" rx="1.5" fill="currentColor"/></svg></button>
       <div class="chip ol" title="Oro"><span class="coin"></span><span id="gold">0</span></div>
       <div class="chip ol" title="Vida de La Madriguera"><span class="heart">♥</span><span id="lives">20</span></div>
-      <div class="chip ol" title="Oleada">OLEADA <span id="wave">0/0</span></div>
+      <div class="chip ol" title="Oleada"><span id="wave-l">OLEADA</span> <span id="wave">0/0</span></div>
       <button class="icon-btn small ol" id="btn-speed" aria-label="Velocidad">x1</button>
       <div id="lvl-name" class="ol"></div>
     </header>
     <div id="banner" class="ol-big"></div>
-    <button id="btn-wave" class="ol" hidden><span>¡OLEADA!</span><small id="wave-sub"></small></button>
+    <button id="btn-wave" class="ol" hidden><span id="wave-main">¡OLEADA!</span><small id="wave-sub"></small></button>
+    <button id="btn-mode" class="ol" hidden>ENVIAR UNIDADES</button>
     <div id="panel" hidden></div>
     <div id="info" hidden></div>
     <footer id="tray" hidden><div id="cards"></div></footer>
@@ -45,6 +46,7 @@
       <div id="map-team" class="ol"></div>
       <div id="fac-pick"></div>
       <p id="fac-pas"></p>
+      <div id="vs-row"><span class="ol">MODO VS</span><button class="btn-ghost ol" data-d="facil">FÁCIL</button><button class="btn-ghost ol" data-d="normal">NORMAL</button><button class="btn-ghost ol" data-d="dificil">DIFÍCIL</button></div>
       <div id="worlds"></div>
     </section>
 

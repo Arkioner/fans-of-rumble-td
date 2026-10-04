@@ -59,6 +59,22 @@ Los jefes dejan sin atacar a tu torre más cercana, sacan refuerzos, o las dos c
 
 Los niveles salen de una regla (`LEVEL_RULE` en `js/td-data.js`): según avanzas hay más oleadas, más tipos de enemigo, más enemigos por oleada, y su vida crece más deprisa. También empiezas con un poco más de oro en cada mundo.
 
+## Modo VS
+
+En la pantalla de campaña, elige tu raza y pulsa **MODO VS** (fácil, normal o difícil). Juegas contra un rival que lleva el juego, con una raza al azar distinta de la tuya. Cada uno defiende su campo y manda unidades al del otro.
+
+- Pulsa **ENVIAR UNIDADES** para cambiar las cartas de torres por las 6 unidades de tu raza. Cada envío cuesta oro, sale por la puerta del campo rival y **sube tu income** para siempre.
+- El **income** es el oro que recibes cada 10 segundos. Empieza en 20. Aquí las bajas dan poco oro: el dinero viene de enviar.
+- Las unidades que llegan a la base rival le quitan vida y **esa vida se suma a tu base** (hasta 150).
+- Tus unidades llevan la pasiva de tu raza (los No-Muertos se levantan una vez, los Ciberpunks llevan escudo, etc.).
+- El botón rojo **RIVAL** te deja mirar su campo; **VOLVER** te devuelve al tuyo.
+- La vida de las unidades enviadas se dobla cada 75 segundos, así que las partidas duran unos 4 o 5 minutos.
+- Gana quien tumba la base del otro.
+
+## Fusiones
+
+En cualquier modo, dos torres **iguales, del mismo nivel y pegadas** (arriba, abajo o a los lados) se pueden fusionar: toca una y pulsa **FUSIONAR**. La otra desaparece, deja libre su casilla y la que queda sube un nivel. Con oro solo se llega al nivel 3; los niveles 4 y 5 solo se consiguen fusionando. Los líderes no se fusionan.
+
 ## Archivos
 
 - `index.html`: la página del juego.

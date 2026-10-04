@@ -12,7 +12,8 @@ const TD = {
   foeHeal: 1,             // cuánto curan los enemigos sanadores respecto al original
   baseAtkCd: 1,           // cada enemigo pega a La Madriguera una vez por segundo
   sellBack: 0.6,          // al vender una torre recuperas el 60 % de lo invertido
-  maxLevel: 3,
+  maxLevel: 3,            // hasta aquí se mejora con oro
+  fuseMax: 5,             // los niveles 4 y 5 solo se consiguen fusionando dos torres iguales que se tocan
   upCost: [0, 0.8, 1.2],  // mejorar a nivel 2 cuesta el 80 % del precio; a nivel 3, el 120 %
   upDmg: 0.4,             // +40 % de daño por nivel
   upRange: 0.1,           // +10 % de alcance por nivel
@@ -21,6 +22,23 @@ const TD = {
   hpGrowth: 0.10,         // cada oleada, los enemigos tienen un 10 % más de vida
   foeHp: 0.85,            // los enemigos tienen el 85 % de la vida del original (aquí no pelean: solo andan)
   rage: { radius: 52, perAlly: 0.10, max: 5 },   // pasiva RABIA del original, ahora entre torres vecinas (las 8 casillas de alrededor)
+};
+
+// Modo VS: cada jugador defiende su campo y manda unidades al del rival.
+const VS = {
+  gold: 400,            // oro inicial de cada uno
+  income: 20, tick: 10, // oro que recibes cada «tick» segundos
+  sendCost: 22,         // oro por punto de «peso» de la unidad que envías
+  incomeRate: 0.06,     // cada envío sube tu income en este % de lo que costó
+  bounty: 0.4,          // las bajas dan menos oro que en campaña: aquí el oro viene del income
+  steal: 1,             // la vida que tus unidades quitan a la base rival se suma a la tuya
+  maxHp: 150,           // tope de vida robando
+  hpDouble: 75,         // cada tantos segundos se dobla la vida de las unidades enviadas (para que la partida acabe)
+  queue: 12,            // máximo de unidades esperando para salir hacia un campo
+  gap: 0.45,            // segundos entre dos unidades enviadas
+  aiGrace: 30,          // segundos que el rival tarda en mandarte la primera unidad
+  aiDef: 1.3,           // el rival gasta este oro en defensa por cada 1 que gasta en enviar
+  ai: { facil: 0.7, normal: 1, dificil: 1.35 },   // income del rival según la dificultad
 };
 
 // Torres de cada facción. key = carta del original (su arte y su nombre vienen de CFG.cards)
@@ -233,6 +251,7 @@ const foeName = k => FOES[k].name || cardDef(k).name;
 
 // Lo que tiene de especial cada ejército enemigo (la pasiva de su raza, vuelta contra ti)
 const ETRAITS = {
+  animales:   { txt: 'Sin trucos: solo muerden.' },   // solo salen como enemigos en el modo VS
   microblizz: { txt: 'Robots de oficina. Sin trucos… salvo los del jefe.' },
   nomuertos:  { hpFrac: 0.6, delay: 1.1, txt: 'RENACER: cada enemigo se levanta una vez con el 60 % de su vida.' },
   streamers:  { speed: 1.2, txt: 'HYPE: todos corren un 20 % más.' },
