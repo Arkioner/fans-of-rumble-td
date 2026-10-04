@@ -6,11 +6,17 @@ Una versión de defensa de torres de [Fans of Rumble](https://github.com/jdaniel
 
 Abre `index.html` en el navegador (o sírvelo con cualquier servidor estático, por ejemplo `python3 -m http.server`).
 
-- Arrastra una carta al campo, o tócala y luego toca el campo, para poner una torre. No se puede construir sobre el camino.
-- Toca una torre para **mejorarla** (hasta el nivel 3) o **venderla** (recuperas el 60 %).
+Es un tower defense clásico de laberinto:
+
+- El campo es una explanada de tierra tan ancha como la pantalla, dividida en casillas. Los robots salen de la sede de Microblizz (arriba) y van a **La Madriguera** (abajo).
+- Arrastra una carta a una casilla, o tócala y luego toca la casilla, para poner una torre. Cada torre ocupa una casilla y bloquea el paso: con ellas construyes el laberinto.
+- **No se puede cerrar el camino**: siempre tiene que quedar al menos un paso hasta La Madriguera. Si una torre lo cerraría, el juego no te deja ponerla.
+- Los enemigos siempre buscan el **camino más corto**. La línea de puntos te lo enseña, y al elegir una casilla ves en amarillo cómo quedaría.
+- Los que llegan a La Madriguera se quedan **atacándola** hasta que los tumbas. Si se queda sin vida, pierdes.
+- Cada nivel tiene un número fijo de **oleadas**. Si acabas con todos los enemigos de la última, ganas. Cuanta más vida le quede a La Madriguera, más estrellas.
+- Toca una torre para **mejorarla** (hasta el nivel 3) o **venderla** (recuperas el 60 % y el camino se vuelve a abrir).
 - Pulsa **¡OLEADA!** para que empiece la siguiente oleada. Si la llamas antes de tiempo, ganas oro extra.
-- Cada enemigo que llega a La Madriguera te quita vidas. Si llegas a 0, pierdes. Acaba con más vidas para sacar más estrellas.
-- **RABIA** (la pasiva de los Animales Locos): cada torre pega un 10 % más por cada torre aliada cercana, hasta +50 %.
+- **RABIA** (la pasiva de los Animales Locos): cada torre pega un 10 % más por cada torre aliada en las casillas de alrededor, hasta +50 %.
 
 ## Facciones en el orden de la historia
 
@@ -35,13 +41,13 @@ Las razas se unen en el mismo orden que en la campaña del original: cada mundo 
 
 | Torre | Oro | Qué hace |
 |---|---|---|
-| CrazyBunny (líder) | 250 | Solo uno. Cada 8 s salta sobre el grupo más grande: daño en área y aturde. |
-| MadSquirrel | 100 | Dos ardillas que tiran bellotas muy rápido. |
-| BoomBeaver | 125 | Dinamita con daño en área. |
-| SlyFox | 150 | Cada tercer golpe hace el triple. |
-| MeerCat | 150 | No ataca: las torres cercanas atacan un 30 % más rápido. |
-| JunkCoon | 200 | Bolsas de basura desde lejos: área y ralentiza. |
-| MechaVaca | 300 | Pisotón que golpea a todos alrededor y los frena. |
+| CrazyBunny (líder) | 150 | Solo uno. Cada 8 s salta sobre el grupo más grande: daño en área y aturde. |
+| MadSquirrel | 50 | Dos ardillas que tiran bellotas muy rápido. |
+| BoomBeaver | 70 | Dinamita con daño en área. |
+| SlyFox | 85 | Cada tercer golpe hace el triple. |
+| MeerCat | 80 | No ataca: las torres cercanas atacan un 30 % más rápido. |
+| JunkCoon | 110 | Bolsas de basura desde lejos: área y ralentiza. |
+| MechaVaca | 160 | Pisotón que golpea a todos alrededor y los frena. |
 
 ## Archivos
 
@@ -49,7 +55,7 @@ Las razas se unen en el mismo orden que en la campaña del original: cada mundo 
 - `css/td.css`: aspecto (mismos colores, letras y botones que el original).
 - `js/00-utils.js`: utilidades pequeñas que el arte del original necesita.
 - `js/vendor/01-config.js` y `js/vendor/03-arte.js`: **copiados sin cambios** de Fans of Rumble (commit `42f2240`). Todos los personajes y edificios se dibujan con código, así que el arte es exactamente el mismo.
-- `js/td-data.js`: **todo el equilibrio** de la defensa de torres (torres, enemigos, oleadas y mundos).
-- `js/td-game.js`: el motor (oleadas, torres, dibujo, controles y menús).
+- `js/td-data.js`: **todo el equilibrio** de la defensa de torres (torres, enemigos, oleadas, mundos y el tamaño del campo).
+- `js/td-game.js`: el motor (casillas y camino más corto, oleadas, torres, dibujo, controles y menús).
 
 El progreso (estrellas) se guarda en el navegador.

@@ -6,8 +6,9 @@
    aquí solo se convierten en torres y oleadas.
    ========================================================= */
 const TD = {
-  startGold: 350,
-  lives: 20,
+  startGold: 400,
+  baseHp: 100,            // vida de La Madriguera: los enemigos que llegan la atacan hasta tirarla
+  baseAtkCd: 1,           // cada enemigo pega a La Madriguera una vez por segundo
   sellBack: 0.6,          // al vender una torre recuperas el 60 % de lo invertido
   maxLevel: 3,
   upCost: [0, 0.8, 1.2],  // mejorar a nivel 2 cuesta el 80 % del precio; a nivel 3, el 120 %
@@ -17,7 +18,7 @@ const TD = {
   earlyBonus: 0.5,        // llamar la oleada antes de tiempo: oro extra por cada segundo que te ahorras
   hpGrowth: 0.10,         // cada oleada, los enemigos tienen un 10 % más de vida
   foeHp: 0.85,            // los enemigos tienen el 85 % de la vida del original (aquí no pelean: solo andan)
-  rage: { radius: 85, perAlly: 0.10, max: 5 },   // pasiva RABIA del original, ahora entre torres
+  rage: { radius: 52, perAlly: 0.10, max: 5 },   // pasiva RABIA del original, ahora entre torres vecinas (las 8 casillas de alrededor)
 };
 
 // Torres de cada facción. key = carta del original (su arte, nombre y descripción vienen de CFG.cards)
@@ -25,24 +26,25 @@ const TD = {
 //       'stomp' (golpea a todos los que tiene alrededor), 'aura' (no ataca: mejora a las torres cercanas)
 const TOWERS = {
   animales: {
-    bunny:     { cost: 250, kind: 'hit',   dmg: 26, cd: 1.0, range: 85,  leader: true, jump: { cd: 8, range: 220, r: 72, dmg: 70, stun: 0.6 },
+    bunny:     { cost: 150, kind: 'hit',   dmg: 26, cd: 1.0, range: 85,  leader: true, jump: { cd: 8, range: 220, r: 72, dmg: 70, stun: 0.6 },
                  desc: 'Líder (solo uno). Pega fuerte y cada 8 s salta sobre el grupo más grande: daño en área y los deja aturdidos.' },
-    squirrel:  { cost: 100, kind: 'shot',  dmg: 11, cd: 0.42, range: 105, shot: 'nut',
+    squirrel:  { cost: 50, kind: 'shot',  dmg: 11, cd: 0.42, range: 105, shot: 'nut',
                  desc: 'Dos ardillas que tiran bellotas a toda velocidad. Baratas y nunca paran.' },
-    beaver:    { cost: 125, kind: 'lob',   dmg: 38, cd: 1.9, range: 115, splash: 48, shot: 'dyn',
+    beaver:    { cost: 70, kind: 'lob',   dmg: 38, cd: 1.9, range: 115, splash: 48, shot: 'dyn',
                  desc: 'Lanza cartuchos de dinamita: daño en área, ideal para los grupos de becarios.' },
-    fox:       { cost: 150, kind: 'hit',   dmg: 30, cd: 1.1, range: 95, crit: { every: 3, mult: 3 },
+    fox:       { cost: 85, kind: 'hit',   dmg: 30, cd: 1.1, range: 95, crit: { every: 3, mult: 3 },
                  desc: 'Ataca desde las sombras: cada tercer golpe hace el triple. Perfecta contra los tanques.' },
-    meercat:   { cost: 150, kind: 'aura',  dmg: 0,  cd: 1,   range: 95, aura: { speed: 0.3 },
+    meercat:   { cost: 80, kind: 'aura',  dmg: 0,  cd: 1,   range: 95, aura: { speed: 0.3 },
                  desc: 'La enfermera no pega: las torres que tiene alrededor atacan un 30 % más rápido.' },
-    junkcoon:  { cost: 200, kind: 'lob',   dmg: 34, cd: 1.5, range: 145, splash: 44, shot: 'trash', slow: { f: 0.6, t: 1.2 },
+    junkcoon:  { cost: 110, kind: 'lob',   dmg: 34, cd: 1.5, range: 145, splash: 44, shot: 'trash', slow: { f: 0.6, t: 1.2 },
                  desc: 'Bolsas de basura desde muy lejos: daño en área y los enemigos pringados van más lentos.' },
-    mechavaca: { cost: 300, kind: 'stomp', dmg: 46, cd: 1.4, range: 72, slow: { f: 0.5, t: 1 },
+    mechavaca: { cost: 160, kind: 'stomp', dmg: 46, cd: 1.4, range: 72, slow: { f: 0.5, t: 1 },
                  desc: 'Un mecha rosa con una vaca dentro. Cada pisotón golpea a todos los que tiene cerca y los frena.' },
   },
 };
 
 // Enemigos (Microblizz). hp y speed se toman de CFG.units; aquí va lo propio de la defensa de torres.
+// leak: daño que hace a La Madriguera cada vez que la golpea.
 const FOES = {
   becario:    { gold: 7,  leak: 1, cost: 1 },
   starbot:    { gold: 10,  leak: 1, cost: 1.6 },
@@ -80,8 +82,8 @@ const WORLDS_TD = [
 // mundo 1: la facción de inicio. Del mundo 2 en adelante, liberar el mundo hace que su facción se una a ti.
 WORLDS_TD.forEach((w, wi) => (w.levels || []).forEach((l, li) => { l.id = `${wi + 1}-${li + 1}`; l.wi = wi; l.li = li; }));
 
-// Camino de los enemigos: de la sede de Microblizz (arriba) a La Madriguera (abajo)
-const TD_PATH = [[270, 150], [270, 205], [88, 222], [88, 330], [452, 352], [452, 470], [88, 492], [88, 606], [270, 626], [270, 728]];
-const FIELD = { x0: 20, x1: 520, y0: 70, y1: 790 };
-const PATH_HALF = 22;      // medio ancho del camino
+// Campo: una explanada de tierra tan ancha como la pantalla, dividida en casillas. Los enemigos salen de la sede de Microblizz
+// (arriba) y buscan siempre el camino más corto hasta La Madriguera (abajo). Cada torre ocupa una casilla: con ellas formas
+// el laberinto, pero nunca se puede cerrar el paso del todo.
+const GRID = { cols: 15, rows: 15, cell: 36, x0: 0, y0: 180, gate: 1 };   // gate: casillas a cada lado del centro que forman la entrada y la salida
 const TOWER_R = 17;        // radio de la peana de una torre
