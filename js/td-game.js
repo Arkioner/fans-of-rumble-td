@@ -488,7 +488,7 @@ function aiThink() {
   const V = G.vs, fac = G.fac, ks = Object.keys(TOWERS[fac]), lead = ks[0], rest = ks.slice(1), cheap = rest[0];
   for (let guard = 0; guard < 6; guard++) {
     const threat = G.foes.length > 8 || G.lives < TD.baseHp * 0.7;
-    const early = V.t < VS.aiGrace || V.n < 6;   // al principio solo se defiende, para que te dé tiempo a montar algo
+    const early = V.t < VS.aiGrace || V.n < 5;   // al principio solo se defiende, para que te dé tiempo a montar algo
     if (!V.defDone && (early || threat || V.def <= V.snd * VS.aiDef)) {
       if (V.pi < V.plan.length) {
         let k = V.n === 5 ? lead : V.n < 4 ? cheap : rest[(V.n * 7 + 3) % rest.length];
@@ -505,7 +505,7 @@ function aiThink() {
       const k = opts[(Math.random() * Math.min(3, opts.length)) | 0], c = sendCost(k);
       // de vez en cuando, en vez de enviar, mejora la unidad que iba a mandar
       const ul = V.ai.ulvl[k] || 1, uc = unitUpCost(k, ul);
-      if (ul < TD.maxLevel && G.gold >= uc + c && Math.random() < VS.aiUp) { G.gold -= uc; V.ai.ulvl[k] = ul + 1; V.snd += uc; continue; }
+      if (ul < TD.maxLevel && G.gold >= uc && Math.random() < VS.aiUp) { G.gold -= uc; V.ai.ulvl[k] = ul + 1; V.snd += uc; continue; }
       G.gold -= c; V.ai.income += sendIncome(k); V.ai.sent++; V.snd += c; V.me.spawnQ.push({ k, gap: VS.gap, lvl: ul });
     }
   }
