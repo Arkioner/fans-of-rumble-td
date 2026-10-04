@@ -76,20 +76,27 @@ En la pantalla de campaña, elige tu raza y pulsa **MODO VS** (fácil, normal o 
 
 En cualquier modo, dos torres **iguales, del mismo nivel y pegadas** (arriba, abajo o a los lados) se pueden fusionar: toca una y pulsa **FUSIONAR**. La otra desaparece, deja libre su casilla y la que queda sube un nivel. Con CAOS solo se llega al nivel 3; los niveles 4 y 5 solo se consiguen fusionando. Los líderes no se fusionan.
 
-## Progreso: oro, gemas, equipo, gashapón, tienda y horas extra
+## Progreso: oro, gemas, colección, inventario, gashapón, tienda y horas extra
 
-Como en el original, fuera de la partida hay **oro** y **gemas**, y todo se guarda en el navegador. (Dentro de la partida, lo que gastas en torres ahora se llama **CAOS**, también como en el original.)
+Como en el original, fuera de la partida hay **oro** y **gemas**, y todo se guarda en el navegador. (Dentro de la partida, lo que gastas en torres se llama **CAOS**, también como en el original.)
 
-- **Menú principal**: JUGAR (campaña y modo VS), EQUIPO, GASHAPÓN, TIENDA y el panel de HORAS EXTRA.
-- **Recompensas**: ganar un nivel por primera vez da 100 de oro y 10 gemas (300 y 50 si es el del jefe), sacar 3 estrellas por primera vez da 50 y 10 más, repetirlo da 30 de oro y perder da 10. El modo VS da 40, 60 o 90 de oro según la dificultad.
+Estas pantallas usan el código y los estilos del juego original, así que se ven y se manejan igual: la cartera de arriba, la colección con sus ranuras, el inventario, la máquina de cápsulas del gashapón, la tienda y la escena de las horas extra.
+
 - **Dos facetas por carta**: cada carta es una **torre** (cuando la pones en tu campo) y una **unidad** (cuando la envías en el modo VS o la pones a hacer horas extra). Las dos comparten nivel, habilidad y equipo.
-- **Nivel**: se sube con oro hasta el 10 (mismos precios que el original). Cada nivel da +6 % al daño de la torre y a la vida de la unidad.
-- **Habilidad y equipo**: cada carta lleva una habilidad, un arma, algo en la cabeza y un accesorio. Casi todos mejoran **solo una faceta** (por ejemplo, Puños de hierro sube el daño de la torre y Piel dura la vida de la unidad), así que hay que elegir qué prefieres mejorar. Cada objeto está en un solo sitio a la vez.
-- **Gashapón**: 50 gemas la tirada (450 las diez), con las probabilidades del original (55 / 30 / 12 / 3 %), garantía de épica cada 10 y de legendaria a las 50, y la calidad de cada copia (de Becario a CEO), que mueve sus números entre el 50 % y el 150 %. Lo que sobra se «despide» a cambio de oro.
+- **Colección**: una pestaña por raza. Cada carta tiene su nivel, su barra de experiencia y cuatro ranuras: habilidad, arma, cabeza y accesorio. En el original solo el líder llevaba objetos; aquí, todas las cartas.
+- **Nivel**: hace falta **experiencia y oro**, hasta el nivel 10 (mismos precios que el original). Cada torre que pones y cada unidad que envías da 4 XP a su carta (hasta 60 por carta y partida, un 30 % más si ganas). Cada nivel da +6 % al daño de la torre y a la vida de la unidad.
+- **Habilidades y objetos**: casi todos mejoran **solo una faceta**, y lo dicen con una etiqueta de TORRE o de UNIDAD. Cada copia está en un solo sitio a la vez.
+- **Inventario**: todas tus copias con su calidad. Puedes filtrarlas, ordenarlas, bloquearlas («contrato indefinido»), volver a sortear sus números («evaluación de desempeño») o despedirlas a cambio de oro, una a una o en masa.
+- **Gashapón**: 50 gemas la tirada, x1, x10 o x50, con las probabilidades del original (55 / 30 / 12 / 3 %), una épica segura por cada 10, legendaria a las 50 y calidad Director cada 10. La calidad de cada copia (de Becario a CEO) mueve sus números entre el 50 % y el 150 %.
 - **Tienda**: los mismos packs de oro y gemas del original. Es la versión de prueba: no se cobra nada y te lo llevas gratis. También está el regalo diario.
-- **Horas extra**: el líder que elijas sigue trabajando aunque no juegues, hasta 12 horas. Trabaja como **unidad**, así que lo que gana por hora depende de su nivel y de lo que lleve para esa faceta.
+- **Horas extra**: el líder que elijas sigue trabajando aunque no juegues, hasta 12 horas, y gana oro, gemas y a veces un objeto. Trabaja como **unidad**, así que lo que gana depende de su nivel y de lo que lleve para esa faceta.
+- **Recompensas**: ganar un nivel por primera vez da 100 de oro y 10 gemas (300 y 50 si es el del jefe), sacar 3 estrellas por primera vez da 50 y 10 más, repetirlo da 30 de oro y perder da 10. El modo VS da 40, 60 o 90 de oro según la dificultad.
 
 En el modo VS, el rival no lleva equipo ni niveles. Las habilidades, los objetos y todos los precios están en `js/td-meta.js`.
+
+## Novedades (informe de parches)
+
+Al abrir el juego después de una actualización sale una ventana con lo que ha cambiado, y se puede volver a ver en el botón NOVEDADES del menú. Con cada versión nueva hay que subir `VERSION` (en `js/td-meta.js`) y añadir su entrada al principio de `NEWS` (en `js/td-menus.js`).
 
 ## Música
 
@@ -104,7 +111,10 @@ El ajuste: las 8 primeras vueltas de cada tema (32 compases) son idénticas al o
 - `js/00-utils.js`: utilidades pequeñas que el arte del original necesita.
 - `js/vendor/01-config.js` y `js/vendor/03-arte.js`: **copiados sin cambios** de Fans of Rumble (commit `42f2240`). Todos los personajes y edificios se dibujan con código, así que el arte es exactamente el mismo.
 - `js/td-data.js`: **todo el equilibrio** de la defensa de torres (las torres y la pasiva de cada raza, enemigos, oleadas, mundos y el tamaño del campo).
-- `js/td-meta.js`: el progreso fuera de la partida (oro y gemas, niveles, habilidades, equipo, gashapón, tienda y horas extra).
+- `js/td-meta.js`: los datos y las reglas del progreso (oro y gemas, niveles, habilidades, objetos, precios y cómo se guarda).
+- `js/td-menus.js`: las pantallas de colección, inventario, gashapón, tienda y novedades. Es el código de `js/09-menus.js` del original, adaptado.
+- `js/td-idle.js`: las horas extra. Se genera desde `js/13-horas-extra.js` del original con `herramientas/horas_extra.py`.
+- `css/menus.css`: los estilos de esos menús, sacados sin cambios de `css/estilos.css` del original con `herramientas/estilos_menus.py`.
 - `js/vendor/05-musica.js`: las canciones del original, **copiadas sin cambios**.
 - `js/td-music.js`: el motor de música del original con el ajuste de la paradoja de Shepard.
 - `js/td-game.js`: el motor (casillas y camino más corto, oleadas, torres, dibujo, controles y menús).

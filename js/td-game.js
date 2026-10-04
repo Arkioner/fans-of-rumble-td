@@ -93,7 +93,7 @@ function build(k, c, r) {
   t.M = G.vs && G.vsCur === 'ai' ? NOMODS : cardMods(k); t.gritoT = 4;   // lo que lleva equipado la carta (el rival no lleva nada)
   // RNG (Memes): cada torre sale con una mutación al azar
   if (G.fac === 'memes') { const M = pick(CFG.passives.memes.muts); t.mut = Object.assign({ id: M.id, txt: M.txt }, PASSIVES.memes.muts[M.id]); pop(x, y - 56, M.txt, M.color, 15); }
-  G.towers.push(t); sfx('place'); puff(x, y, '#d9b77e', 10);
+  G.towers.push(t); xpPlay(k); sfx('place'); puff(x, y, '#d9b77e', 10);
   return true;
 }
 function upgrade(t) { const c = upCost(t); if (t.lvl >= TD.maxLevel || G.gold < c) return; G.gold -= c; t.spent += c; t.lvl++; sfx('up'); pop(t.x, t.y - 50, '¡NIVEL ' + t.lvl + '!', '#ffcb3d', 16); ring(t.x, t.y, 40, 'rgba(255,203,61,.9)'); }
@@ -478,7 +478,7 @@ function vsSteal(to) { const V = G.vs; if (V.stolen > 0) { to.lives = Math.min(V
 function vsSend(k) {
   const V = G.vs, c = sendCost(k); if (G.over || G.gold < c) return false;
   if (V.ai.spawnQ.length >= VS.queue) { num(270, 720, 'COLA LLENA', '#ff4b5c', 14); return false; }
-  G.gold -= c; V.me.income += sendIncome(k); V.me.sent++; V.ai.spawnQ.push({ k, gap: VS.gap, lvl: V.me.ulvl[k] || 1 });
+  G.gold -= c; xpPlay(k); V.me.income += sendIncome(k); V.me.sent++; V.ai.spawnQ.push({ k, gap: VS.gap, lvl: V.me.ulvl[k] || 1 });
   num(270, 720, '+' + sendIncome(k) + ' income', '#ffcb3d', 14); sfx('horn'); return true;
 }
 // mejorar una unidad dentro de la partida: las que envíes a partir de ahora salen más duras y pegan más a la base
@@ -961,10 +961,6 @@ $('#pz-retry').onclick = () => { $('#scr-pause').hidden = true; if (G.vs) startV
 $('#pz-map').onclick = () => { $('#scr-pause').hidden = true; G.paused = false; showMap(); };
 $('#res-map').onclick = () => showMap();
 $('#map-back').onclick = () => showMenu();
-$('#btn-coll').onclick = () => { sfx('place'); showColl(); };
-$('#btn-gacha').onclick = () => { sfx('place'); showGacha(); };
-$('#btn-shop').onclick = () => { sfx('place'); showShop(); };
-for (const b of document.querySelectorAll('[data-back]')) b.onclick = () => showMenu();
 const soundBtns = () => { for (const b of document.querySelectorAll('.btn-sound')) { b.textContent = SAVE.muted ? '🔇' : '🔊'; b.setAttribute('aria-label', SAVE.muted ? 'Activar sonido' : 'Silenciar sonido'); } };
 for (const b of document.querySelectorAll('.btn-sound')) b.onclick = () => { SAVE.muted = !SAVE.muted; saveGame(); soundBtns(); };
 
@@ -984,7 +980,7 @@ async function boot() {
   fit(); addEventListener('resize', fit); soundBtns();
   showMenu();
   portrait($('#title-art'), 'bunny', 150); portrait($('#title-foe'), 'fallen', 110, -1);
-  window.__TD = { G, TOWERS, vsUpgrade, cardMods, pull, equip, levelUp, idleRates, startVS, vsUpdate, vsSend, vsView, fuse, fuseMate, startLevel, startWave, build, sell, upgrade, update, canPlace, whyNot, flow, BLOCK, ENTRY, WORLDS_TD, SAVE, get DIST() { return DIST; } };   // para las pruebas automáticas
+  window.__TD = { G, TOWERS, vsUpgrade, cardMods, startVS, vsUpdate, vsSend, vsView, fuse, fuseMate, startLevel, startWave, build, sell, upgrade, update, canPlace, whyNot, flow, BLOCK, ENTRY, WORLDS_TD, SAVE, get DIST() { return DIST; } };   // para las pruebas automáticas
   requestAnimationFrame(frame);
 }
-boot();
+// boot() se llama al final de js/td-idle.js, cuando ya están cargados los menús
