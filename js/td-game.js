@@ -97,7 +97,7 @@ function build(k, c, r) {
   return true;
 }
 function upgrade(t) { const c = upCost(t); if (t.lvl >= TD.maxLevel || G.gold < c) return; G.gold -= c; t.spent += c; t.lvl++; sfx('up'); pop(t.x, t.y - 50, '¡NIVEL ' + t.lvl + '!', '#ffcb3d', 16); ring(t.x, t.y, 40, 'rgba(255,203,61,.9)'); }
-function sell(t) { G.gold += sellOf(t); G.towers = G.towers.filter(o => o !== t); BLOCK[t.cell] = 0; reflow(); G.sel = null; sfx('coin'); puff(t.x, t.y, '#d9b77e', 12); }
+function sell(t) { G.gold += sellOf(t); G.towers = G.towers.filter(o => o !== t); BLOCK[t.cell] = 0; reflow(); if (G.sel === t) G.sel = null; sfx('coin'); puff(t.x, t.y, '#d9b77e', 12); }
 
 /* ---------- ataques, pasivas y habilidades ---------- */
 // cada torre tiene como mucho una habilidad con reloj: se deja preparada en D.ab
@@ -446,7 +446,14 @@ function startVS(diff) {
   // el rival empieza con una línea vertical en el centro (los enemigos la recorren entera y todas las torres les pegan)
   // y luego la convierte en un laberinto en serpentina
   const plan = [], mid = (COLS - 1) / 2;
-  for (const r of [6, 7, 5, 8, 4, 9, 3, 10, 2, 11, 12]) plan.push([mid, r]); [2, 5, 8, 11].forEach((r, ri) => { const cols = []; for (let c = 0; c < COLS; c++) if (ri % 2 ? c !== 0 : c !== COLS - 1) cols.push(c); cols.sort((a, b) => Math.abs(a - 7) - Math.abs(b - 7)); cols.forEach(c => plan.push([c, r])); });
+  for (const r of [6, 7, 5, 4, 3, 8, 9, 10, 2, 11, 12]) plan.push([mid, r]);   // la 6.ª (su líder) cae en una fila de muro, que nunca se vende
+  // después, muro a muro: antes de cerrar cada fila horizontal vende las torres del centro que taparían el pasillo de encima,
+  // para que el camino pase de bajar recto a hacer giros de lado a lado
+  [2, 5, 8, 11].forEach((r, ri) => {
+    if (ri) for (const sr of [r - 2, r - 1]) plan.push(['vender', mid, sr]);
+    const cols = []; for (let c = 0; c < COLS; c++) if (ri % 2 ? c !== 0 : c !== COLS - 1) cols.push(c); cols.sort((a, b) => Math.abs(a - mid) - Math.abs(b - mid)); cols.forEach(c => plan.push([c, r]));
+  });
+  plan.push(['vender', mid, 12]);
   Object.assign(G, { screen: 'play', level: VS_LEVEL, wave: 1, waves: 1, inWave: true, nextT: 0, place: null, ghost: null, sel: null, over: false, paused: false, trayMode: 'build' });
   G.vs = { me, ai, view: 'me', t: 0, tickT: VS.tick, stolen: 0, diff, aiT: 1.5, plan, pi: 0, n: 0, def: 0, snd: 0, defDone: false };
   me.ulvl = {}; ai.ulvl = {};   // nivel de cada unidad dentro de esta partida
@@ -492,7 +499,10 @@ function aiThink() {
     const threat = G.foes.length > 8 || G.lives < TD.baseHp * 0.7;
     const early = V.t < VS.aiGrace || V.n < 5;   // al principio solo se defiende, para que te dé tiempo a montar algo
     if (!V.defDone && (early || threat || V.def <= V.snd * VS.aiDef)) {
-      if (V.pi < V.plan.length) {
+      if (V.pi < V.plan.length && V.plan[V.pi][0] === 'vender') {
+        const [, sc, sr] = V.plan[V.pi], t = G.towers.find(o => o.cell === idx(sc, sr)); V.pi++;
+        if (t && !tdef(t).leader) sell(t);
+      } else if (V.pi < V.plan.length) {
         let k = V.n === 5 ? lead : V.n < 4 ? cheap : rest[(V.n * 7 + 3) % rest.length];
         if (G.gold < TOWERS[fac][k].cost) { if (G.gold >= TOWERS[fac][cheap].cost) k = cheap; else return; }
         const [c, r] = V.plan[V.pi], why = whyNot(c, r);
