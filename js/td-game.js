@@ -526,17 +526,6 @@ function aiThink() {
 function vsView(v) {
   const V = G.vs; V.view = v; G.place = null; G.ghost = null; G.sel = null; hidePanel(); hud();
 }
-function showVsResult(win) {
-  const V = G.vs; G.screen = 'result'; showScreen('scr-result');
-  $('#res-title').textContent = win ? '¡VICTORIA!' : FACTIONS[V.me.fac].base + ' HA CAÍDO';
-  $('#res-title').className = 'ol-big ' + (win ? 'win' : 'lose');
-  $('#res-stars').innerHTML = '';
-  const m = Math.floor(V.t / 60), s = String(Math.floor(V.t % 60)).padStart(2, '0');
-  $('#res-msg').innerHTML = (win ? `Has tumbado la base de ${FAC_NAME(V.ai.fac)} en ${m}:${s}.` : `${capFirst(FAC_NAME(V.ai.fac))} han tumbado tu base en ${m}:${s}.`) + `<br>Enviaste ${V.me.sent} unidades y tu income llegó a ${V.me.income}. El rival envió ${V.ai.sent}.<br>` + vsReward(win, V.diff);
-  const art = $('#res-art'); requestAnimationFrame(() => portrait(art, FACTIONS[win ? V.me.fac : V.ai.fac].leader, 120));
-  $('#res-next').hidden = true; $('#res-retry').onclick = () => startVS(V.diff);
-}
-
 /* ---------- fusión de torres en contacto ---------- */
 // dos torres iguales, del mismo nivel y pegadas (arriba, abajo o a los lados) se pueden fusionar en una de un nivel más
 function fuseMate(t) {
@@ -925,57 +914,14 @@ function startLevel(L) {
   hidePanel(); showScreen(null); buildTray(); hud(); $('#lvl-name').textContent = `${L.id} · ${L.name}`;
   banner(`${L.id} · ${L.name.toUpperCase()}`);
 }
-function showResult(win, st, first) {
-  G.screen = 'result'; showScreen('scr-result');
-  const L = G.level, W0 = WORLDS_TD[L.wi], next = W0.levels[L.li + 1];
-  $('#res-title').textContent = win ? '¡VICTORIA!' : FACTIONS[G.fac].base + ' HA CAÍDO';
-  $('#res-title').className = 'ol-big ' + (win ? 'win' : 'lose');
-  $('#res-stars').innerHTML = [1, 2, 3].map(i => `<span class="${i <= st ? 'on' : ''}">★</span>`).join('');
-  let msg = win ? `¡${capFirst(FACTIONS[G.fac].end)} sigue en pie con ${G.lives} de vida!` : `Tu base ha caído en la oleada ${G.wave} de ${G.waves}. Prueba otras torres u otro laberinto.`;
-  const nextWorld = WORLDS_TD[L.wi + 1], go = next || (nextWorld && nextWorld.levels[0]);
-  if (win && !next) msg += nextWorld ? `<br><b>¡Mundo liberado!</b> Lo siguiente en la historia: <b>${nextWorld.name}</b>.` : '<br><b>¡Has terminado la campaña!</b> Microblizz y Phony ya no cierran más juegos.';
-  $('#res-msg').innerHTML = msg + '<br>' + G.rw;
-  const art = $('#res-art'); requestAnimationFrame(() => portrait(art, win ? FACTIONS[G.fac].leader : L.deck[0], 120));
-  $('#res-next').hidden = !(win && go); $('#res-next').onclick = () => startLevel(go);
-  $('#res-retry').onclick = () => startLevel(L);
-}
 const FAC_NAME = f => (f && FACTIONS[f] ? (FACTIONS[f].los || 'los ' + FACTIONS[f].name) : '');
-function showMap() {
-  G.vs = null;
-  G.screen = 'map'; showScreen('scr-map');
-  const list = $('#worlds'); buildFacPick();
-  list.innerHTML = WORLDS_TD.map((w, wi) => {
-    const open = SAVE.testAll || wi === 0 || worldDone(wi - 1), E = FACTIONS[w.efac];
-    const lv = `<div class="lvls">${w.levels.map(l => { const o = levelOpen(l), s = starsOf(l.id); return `<button class="lvl${l.boss ? ' boss' : ''}" data-l="${l.id}" ${o ? '' : 'disabled'}><b>${l.id}</b><span>${l.name}</span><i>${o ? '★'.repeat(s) + '<em>' + '★'.repeat(3 - s) + '</em>' : '🔒'}</i></button>`; }).join('')}</div>`;
-    return `<div class="world${open ? '' : ' locked'}"><div class="wh"><canvas data-k="${E.leader || E.units[0]}"></canvas><div><div class="wn ol">Mundo ${wi + 1} · ${w.name}</div><div class="wj">${open ? w.story : 'Libera el mundo anterior para entrar.'}</div></div></div>${open ? `<div class="wt"><b>Enemigos: ${CORP[w.efac] || E.corr || E.name + ' corrompidos'}.</b> ${ETRAITS[w.efac].txt}</div>` : ''}${lv}</div>`;
-  }).join('');
-  for (const b of list.querySelectorAll('.lvl')) b.onclick = () => { const [wi, li] = b.dataset.l.split('-').map(Number); startLevel(WORLDS_TD[wi - 1].levels[li - 1]); };
-  requestAnimationFrame(() => { for (const c of list.querySelectorAll('canvas[data-k]')) portrait(c, c.dataset.k, 40); });
-}
 // elegir raza: todas están disponibles desde el principio
 const facNow = () => (TOWERS[SAVE.fac] ? SAVE.fac : 'animales');
 const BGS = {}, bgOf = f => BGS[f] || (BGS[f] = buildTDBackground(f));
-function buildFacPick() {
-  const box = $('#fac-pick'), cur = facNow(), F = FACTIONS[cur];
-  box.innerHTML = FACTION_ORDER.filter(f => TOWERS[f]).map(f => `<button class="fac${f === cur ? ' sel' : ''}" data-f="${f}" aria-label="${FACTIONS[f].name}" aria-pressed="${f === cur}"><canvas></canvas></button>`).join('');
-  for (const b of box.children) b.onclick = () => { SAVE.fac = b.dataset.f; saveGame(); sfx('place'); buildFacPick(); };
-  requestAnimationFrame(() => { for (const b of box.children) portrait(b.querySelector('canvas'), FACTIONS[b.dataset.f].leader, 42); });
-  $('#map-team').textContent = 'Tu raza: ' + F.name;
-  $('#fac-pas').innerHTML = `<b>${F.passive}</b> · ${PASSIVES[cur].txt}`;
-}
-
 /* ---------- botones ---------- */
-$('#btn-play').onclick = () => { sfx('place'); showMap(); };
 $('#btn-wave').onclick = () => { if (G.vs) vsView(G.vs.view === 'me' ? 'ai' : 'me'); else { startWave(); hud(); } };
 $('#btn-mode').onclick = () => { if (G.vs.view !== 'me') vsView('me'); G.trayMode = G.trayMode === 'send' ? 'build' : 'send'; G.place = null; G.ghost = null; buildTray(); hud(); };
-for (const b of document.querySelectorAll('#vs-row button')) b.onclick = () => { sfx('place'); startVS(b.dataset.d); };
 $('#btn-speed').onclick = () => { G.speed = G.speed === 1 ? 2 : 1; hud(); };
-$('#btn-pause').onclick = () => { if (G.over) return; G.paused = true; $('#scr-pause').hidden = false; };
-$('#pz-go').onclick = () => { G.paused = false; $('#scr-pause').hidden = true; };
-$('#pz-retry').onclick = () => { $('#scr-pause').hidden = true; if (G.vs) startVS(G.vs.diff); else startLevel(G.level); };
-$('#pz-map').onclick = () => { $('#scr-pause').hidden = true; G.paused = false; showMap(); };
-$('#res-map').onclick = () => showMap();
-$('#map-back').onclick = () => showMenu();
 const soundBtns = () => { for (const b of document.querySelectorAll('.btn-sound')) { b.textContent = SAVE.muted ? '🔇' : '🔊'; b.setAttribute('aria-label', SAVE.muted ? 'Activar sonido' : 'Silenciar sonido'); } };
 for (const b of document.querySelectorAll('.btn-sound')) b.onclick = () => { SAVE.muted = !SAVE.muted; saveGame(); soundBtns(); };
 
@@ -995,7 +941,6 @@ async function boot() {
   buildSprites(); BG = bgOf('animales');
   fit(); addEventListener('resize', fit); soundBtns();
   showMenu();
-  portrait($('#title-art'), 'bunny', 150); portrait($('#title-foe'), 'fallen', 110, -1);
   window.__TD = { G, TOWERS, vsUpgrade, cardMods, startVS, vsUpdate, vsSend, vsView, fuse, fuseMate, startLevel, startWave, build, sell, upgrade, update, canPlace, whyNot, flow, BLOCK, ENTRY, WORLDS_TD, SAVE, get DIST() { return DIST; } };   // para las pruebas automáticas
   requestAnimationFrame(frame);
 }

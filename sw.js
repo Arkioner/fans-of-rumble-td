@@ -4,7 +4,7 @@
 // La versión llega en la dirección con la que se registra (sw.js?v=…), así que no hay que tocar este archivo al publicar.
 const CACHE = 'fortd-v' + (new URL(self.location).searchParams.get('v') || '0');
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable.png', './css/td.css', './css/menus.css',
-  './js/00-utils.js', './js/vendor/01-config.js', './js/vendor/03-arte.js', './js/vendor/05-musica.js', './js/vendor/02-chat.js', './js/td-extras.js', './js/td-data.js', './js/td-meta.js', './js/td-game.js', './js/td-menus.js', './js/td-idle.js', './js/td-music.js'];
+  './js/00-utils.js', './js/vendor/01-config.js', './js/vendor/03-arte.js', './js/vendor/05-musica.js', './js/vendor/08-textos.js', './js/td-pantallas.js', './js/vendor/02-chat.js', './js/td-extras.js', './js/td-data.js', './js/td-meta.js', './js/td-game.js', './js/td-menus.js', './js/td-idle.js', './js/td-music.js'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => Promise.all(CORE.map(u => c.add(u).catch(() => null)))).then(() => self.skipWaiting()));

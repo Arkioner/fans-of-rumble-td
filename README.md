@@ -125,6 +125,7 @@ El **chat en directo** usa las frases del original (`js/vendor/02-chat.js`). El 
 - `css/menus.css`: los estilos de esos menús, sacados sin cambios de `css/estilos.css` del original con `herramientas/estilos_menus.py`.
 - `js/vendor/05-musica.js`: las canciones del original, **copiadas sin cambios**.
 - `js/td-music.js`: el motor de música del original con el ajuste de la paradoja de Shepard.
+- `js/td-pantallas.js`: portada, campaña, pantalla de antes de jugar, cómo se juega, pausa y final, con la misma estructura y clases que el original. Sus estilos están en `css/menus.css`, que se genera desde el CSS del original con `herramientas/estilos_menus.py` (lo propio va en `css/td.css`).
 - `js/td-game.js`: el motor (casillas y camino más corto, oleadas, torres, dibujo, controles y menús).
 
 El progreso (estrellas) se guarda en el navegador.

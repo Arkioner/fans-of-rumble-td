@@ -16,6 +16,8 @@
   --outline: #20102c;
   --panel: rgba(38, 20, 60, 0.94);
   --modal: rgba(12, 6, 20, 0.82);
+  /* los mismos nombres que usa css/estilos.css del original: sin ellos, las reglas copiadas en menus.css se quedan sin color */
+  --chaos: #d43cff; --chaos-lite: #f3a6ff; --chaos-deep: #7b22ff; --enemy-deep: #173d8f; --scrim: rgba(16, 8, 26, 0.9); --panel-2: rgba(20, 10, 34, 0.8); --off: #3a2b52;
   --font-display: "Luckiest Guy", "Arial Black", Impact, sans-serif;
   --font-ui: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
 }
@@ -95,11 +97,6 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 .btn-ghost:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--outline); }
 .screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; padding: 40px 26px; background: radial-gradient(110% 70% at 50% 20%, rgba(43, 20, 70, 0.55), rgba(21, 11, 33, 0.9)); }
 .corner { position: absolute; top: 14px; right: 14px; }
-.logo { font-size: 66px; line-height: 0.92; text-align: center; color: var(--player-lite); margin-top: 14px; transform: rotate(-3deg); }
-.logo-sub { font-family: var(--font-display); font-size: 30px; color: var(--gold); margin-top: 10px; letter-spacing: 2px; }
-.title-art { display: flex; align-items: flex-end; gap: 4px; margin: 14px 0 6px; }
-.title-art canvas { width: 150px; height: 150px; }
-.title-art .vs { font-size: 36px; color: var(--ink); margin-bottom: 54px; }
 .story { font-size: 17px; line-height: 1.35; font-weight: 600; text-align: center; max-width: 470px; margin: 4px 0 22px; }
 .story b { color: var(--player-lite); }
 .hint { font-size: 14px; color: var(--ink-dim); text-align: center; max-width: 420px; margin-top: 22px; font-weight: 600; }
@@ -159,10 +156,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 .ft, .fu { font-style: normal; font-size: 0.8em; font-weight: 800; padding: 1px 5px; border-radius: 5px; color: var(--outline); margin: 0 2px 0 0; white-space: nowrap; }
 .ft { background: #ffb04f; } .fu { background: #63cfe0; }
 .deck-stats .fu, .inv-desc .fu, .pk-desc .fu, .gr-desc .fu { margin-left: 4px; }
-.rw { display: inline-block; margin-top: 6px; font-family: var(--font-display); font-size: 19px; color: var(--gold); }
 #toast:not(.menu) { top: 104px; }   /* en partida, por debajo del marcador */
-#scr-title { padding-top: 62px; }
-#scr-title .home-grid { grid-template-columns: repeat(3, 1fr); }
 #scr-title .btn-sound.corner { position: absolute; left: 14px; top: 14px; }
 .card.send canvas { height: 74px; }
 .upg { position: absolute; left: 3px; right: 3px; bottom: 4px; font-family: var(--font-display); font-size: 13px; line-height: 1; padding: 6px 2px 3px; border-radius: 8px; border: 2px solid var(--outline); background: linear-gradient(to bottom, #d9a8ff, #7a35c9); color: var(--ink); text-align: center; }
@@ -170,3 +164,31 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 .upg.max { background: var(--tray); color: var(--ink-dim); }
 .card.send.off { filter: none; }
 .card.send.off canvas, .card.send.off .nm, .card.send.off .cost { filter: grayscale(0.85) brightness(0.75); }
+
+/* ---------- ajustes propios sobre los menús copiados del original (van aquí porque menus.css se regenera) ---------- */
+#ui #scr-title .home-grid { grid-template-columns: repeat(4, 1fr); max-width: 470px; }
+#ui #scr-title .camp-row .btn-big { flex: 1 1 auto; }
+#ui .passive-box svg { flex: none; width: 26px; height: 32px; }
+#ui #scr-prep { gap: 12px; }
+#ui #scr-pause .btn-sound { position: absolute; left: 14px; top: 14px; }
+#ui .opt-list { margin-top: 2px; touch-action: pan-y; }
+#ui .opt-row .btn-ghost:disabled { opacity: 0.6; cursor: default; }
+#ui .world-story b { color: var(--ink); }
+/* ---------- chat en directo, caja de avisos y tutorial (como en el original) ---------- */
+#ui #chat { position: absolute; left: 6px; bottom: 228px; width: 216px; height: 150px; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; pointer-events: none; z-index: 4; overflow: hidden; -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 26px); mask-image: linear-gradient(to bottom, transparent 0, #000 26px); }
+#chat .cl { font-size: 13.5px; font-weight: 700; line-height: 1.2; background: rgba(16, 8, 28, 0.55); border-radius: 9px; padding: 4px 9px 3px; color: #f3eaff; text-align: left; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9), 0 0 2px rgba(0, 0, 0, 0.9); animation: clin 0.25s ease-out; transition: opacity 0.6s; flex: none; }
+#chat .cl b { font-weight: 800; }
+#chat .cl.out { opacity: 0; }
+#ui #feed { position: absolute; right: 6px; bottom: 296px; width: 200px; height: 150px; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-end; gap: 3px; pointer-events: none; z-index: 4; overflow: hidden; }
+#feed[hidden] { display: none; }
+#feed .fl { display: flex; align-items: center; gap: 5px; max-width: 100%; font-family: var(--font-display); font-size: 12.5px; line-height: 1.15; background: rgba(16, 8, 28, 0.6); border-radius: 9px; padding: 4px 8px 2px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9); animation: clin 0.25s ease-out; transition: opacity 0.6s; }
+#feed .fl.out { opacity: 0.25; }
+#feed .fl i { flex: none; width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid #20102c; margin-top: -2px; background: #ff9a3c; }
+#feed .fl span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#feed .fl b { flex: none; font-weight: 400; color: #ffe06a; font-size: 12px; }
+@keyframes clin { from { transform: translateY(8px); opacity: 0; } }
+#ui #tut { position: absolute; left: 50%; top: 96px; transform: translateX(-50%); width: 430px; box-sizing: border-box; background: var(--panel); border: 3px solid var(--gold); border-radius: 14px; padding: 10px 14px 8px; font-size: 15px; font-weight: 700; line-height: 1.3; text-align: center; z-index: 6; box-shadow: 0 5px 0 var(--outline); pointer-events: none; }
+#tut[hidden] { display: none; }
+#tut b { color: var(--gold); }
+#tut span { display: block; font-family: var(--font-display); font-size: 12px; color: var(--ink-dim); margin-bottom: 2px; }
+#tut .btn-link { display: block; margin: 5px auto 0; font-size: 12px; pointer-events: auto; }

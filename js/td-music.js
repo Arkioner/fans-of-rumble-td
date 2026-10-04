@@ -143,7 +143,7 @@ function musicUpdate() {
   const s = G.screen, L = G.level, lastWave = s === 'play' && !G.vs && L && G.wave >= G.waves && G.inWave;
   let want = SAVE.menuMus && TRACKS[SAVE.menuMus] ? SAVE.menuMus : 'menu';   // la del menú la eliges en Opciones
   if (s === 'play') want = G.over ? M.want : lastWave && L.boss ? (TRACKS['boss' + L.wi] ? 'boss' + L.wi : 'boss') : TRACKS[G.fac] ? G.fac : 'menu';   // tu raza; el jefe del mundo cuando sale
-  else if (s === 'result') want = document.querySelector('#res-title').classList.contains('win') ? 'win' : 'lose';
+  else if (s === 'result') want = document.querySelector('#end-title').classList.contains('win') ? 'win' : 'lose';
   if (want !== M.want) { M.want = want; musicSet(want); }
   M.tmT = lastWave ? 1.18 : 1;                                // la última oleada va más rápida
   const duck = s === 'play' && G.paused;                      // en pausa suena apagada

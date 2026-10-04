@@ -391,6 +391,12 @@ function toast(msg, good) { const t = $('#toast'); t.textContent = msg; t.classL
    Con cada versión nueva hay que subir VERSION (en td-meta.js) y poner aquí arriba del todo lo que cambia.
    ========================================================= */
 const NEWS = [
+  { v: '0.9.0', real: [
+      '<b>Menús como los del original</b>: la portada, la campaña, la pantalla de antes de jugar, la pausa y el final de la partida tienen ahora su mismo aspecto.',
+      '<b>Antes de jugar</b> eliges tu facción en una pantalla propia, con su pasiva. En el modo VS eliges ahí también el rival.',
+      '<b>Cómo se juega</b>: un resumen en 8 pasos, en la portada.',
+      'Arreglados colores que faltaban en algunos menús (los fondos de la cartera y de varias cajas salían transparentes).'],
+    joke: ['Microblizz ha renovado los menús. Los precios, también.', 'Phony asegura que la pantalla de pausa es una función exclusiva.'] },
   { v: '0.8.1', real: [
       '<b>Poner varias torres seguidas</b>: al colocar una torre, su carta se queda elegida unos segundos. Toca otra casilla y pones otra igual, sin volver a la bandeja.',
       'Se suelta sola a los 4 segundos, si no te llega el CAOS para otra, o si tocas la carta o una torre ya puesta.'],

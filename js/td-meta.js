@@ -8,7 +8,7 @@
      · UNIDAD (U): cuando la envías al rival en el modo VS o la pones a hacer horas extra.
    Casi todo lo que te equipas mejora solo una faceta, así que hay que elegir cuál prefieres.
    ========================================================= */
-const VERSION = '0.8.1';
+const VERSION = '0.9.0';
 const ECON = {
   lvlStep: 0.06, maxLvl: 10,                                                     // +6 % por nivel: daño de la torre y vida de la unidad
   xpNeed:   [0, 50, 100, 175, 300, 500, 800, 1300, 2000, 3200],                  // XP para pasar del nivel i al i+1
@@ -201,7 +201,7 @@ function campReward(L, win, st, first, first3) {
   return give(gold, gems, xpGrant(win));
 }
 const vsReward = (win, diff) => give(win ? ECON.vs[diff] : ECON.vs.lose, 0, xpGrant(win));
-function give(gold, gems, xp) { SAVE.gold += gold; SAVE.gems += gems; saveGame(); return `<span class="rw">+${fmt(gold)} de oro${gems ? ` y +${gems} gemas` : ''}${xp ? ` · +${fmt(xp)} XP para tus cartas` : ''}</span>`; }
+function give(gold, gems, xp) { SAVE.gold += gold; SAVE.gems += gems; saveGame(); return `<span class="rw-chip ol">${COIN_SVG}+${fmt(gold)}</span>${gems ? `<span class="rw-chip ol">${GEM_SVG}+${fmt(gems)}</span>` : ''}${xp ? `<div class="rw-xp">Experiencia: +${fmt(xp)} para las cartas que has usado</div>` : ''}`; }
 
 /* ---------- horas extra: el líder que elijas sigue trabajando (como UNIDAD) aunque no juegues. Se llena a las 12 h ---------- */
 const IDLE = { cap: 12, gold: 60, gExp: 1.6, gems: 1, gemsK: 2.5, item: 0.02, itemK: 0.05 };
