@@ -29,7 +29,7 @@ const VS = {
   gold: 400,            // oro inicial de cada uno
   income: 20, tick: 10, // oro que recibes cada «tick» segundos
   sendCost: 22,         // oro por punto de «peso» de la unidad que envías
-  incomeRate: 0.06,     // cada envío sube tu income en este % de lo que costó
+  incomeRate: 0.15,     // cada envío sube tu income en este % de lo que costó
   bounty: 0.4,          // las bajas dan menos oro que en campaña: aquí el oro viene del income
   steal: 1,             // la vida que tus unidades quitan a la base rival se suma a la tuya
   maxHp: 150,           // tope de vida robando
