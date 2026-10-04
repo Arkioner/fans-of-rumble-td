@@ -443,8 +443,10 @@ const sendIncome = k => Math.max(1, Math.round(sendCost(k) * VS.incomeRate));
 function startVS(diff) {
   const fac = facNow(), rival = pick(FACTION_ORDER.filter(f => f !== fac && TOWERS[f]));
   const me = newBoard(fac, rival), ai = newBoard(rival, fac);
-  // el rival planea un laberinto en serpentina
-  const plan = []; [2, 5, 8, 11].forEach((r, ri) => { const cols = []; for (let c = 0; c < COLS; c++) if (ri % 2 ? c !== 0 : c !== COLS - 1) cols.push(c); cols.sort((a, b) => Math.abs(a - 7) - Math.abs(b - 7)); cols.forEach(c => plan.push([c, r])); });
+  // el rival empieza con una línea vertical en el centro (los enemigos la recorren entera y todas las torres les pegan)
+  // y luego la convierte en un laberinto en serpentina
+  const plan = [], mid = (COLS - 1) / 2;
+  for (const r of [6, 7, 5, 8, 4, 9, 3, 10, 2, 11, 12]) plan.push([mid, r]); [2, 5, 8, 11].forEach((r, ri) => { const cols = []; for (let c = 0; c < COLS; c++) if (ri % 2 ? c !== 0 : c !== COLS - 1) cols.push(c); cols.sort((a, b) => Math.abs(a - 7) - Math.abs(b - 7)); cols.forEach(c => plan.push([c, r])); });
   Object.assign(G, { screen: 'play', level: VS_LEVEL, wave: 1, waves: 1, inWave: true, nextT: 0, place: null, ghost: null, sel: null, over: false, paused: false, trayMode: 'build' });
   G.vs = { me, ai, view: 'me', t: 0, tickT: VS.tick, stolen: 0, diff, aiT: 1.5, plan, pi: 0, n: 0, def: 0, snd: 0, defDone: false };
   me.ulvl = {}; ai.ulvl = {};   // nivel de cada unidad dentro de esta partida
