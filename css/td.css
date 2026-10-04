@@ -52,7 +52,8 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 @keyframes ban { 0% { opacity: 0; transform: scale(0.6); } 12% { opacity: 1; transform: scale(1.08); } 20% { transform: scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-20px); } }
 #btn-wave { position: absolute; right: 12px; bottom: 182px; width: 98px; height: 98px; border-radius: 50%; border: 4px solid var(--outline); cursor: pointer;
   background: radial-gradient(circle at 40% 30%, #ff9a7a, var(--danger) 60%, #a01828); box-shadow: 0 6px 0 var(--outline), inset 0 4px 0 rgba(255, 255, 255, 0.35);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 17px; line-height: 1; padding-top: 6px; animation: beat 1.2s ease-in-out infinite; }
+  display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 17px; line-height: 1; padding-top: 6px; }
+#btn-wave.beat { animation: beat 1.2s ease-in-out infinite; }   /* solo late cuando toca llamar a la oleada, no en el modo VS */
 #btn-wave small { font-family: var(--font-ui); font-weight: 800; font-size: 12px; margin-top: 3px; }
 #btn-wave:active { transform: translateY(3px); box-shadow: 0 3px 0 var(--outline); }
 @keyframes beat { 50% { transform: scale(1.06); } }

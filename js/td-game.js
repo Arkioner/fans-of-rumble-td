@@ -821,21 +821,21 @@ function refreshTray() {
 }
 function hud() {
   const V = G.vs, wb = $('#btn-wave');
-  $('#gold').textContent = G.gold; $('#lives').textContent = Math.ceil(G.lives); $('#ui').classList.toggle('vs', !!V); $('#btn-mode').hidden = !V;
+  setText($('#gold'), G.gold); setText($('#lives'), Math.ceil(G.lives)); $('#ui').classList.toggle('vs', !!V); if ($('#btn-mode').hidden !== !V) $('#btn-mode').hidden = !V;
   if (V) {
     // modo VS: la vida del rival, tu income y el botón para mirar su campo
-    $('#wave-l').textContent = 'RIVAL ♥'; $('#wave').textContent = Math.ceil(V.ai.lives);
-    wb.hidden = G.over; $('#wave-main').textContent = V.view === 'me' ? 'RIVAL' : 'VOLVER'; $('#wave-sub').textContent = V.view === 'me' ? 'ver su campo' : 'a tu campo';
-    $('#btn-mode').textContent = G.trayMode === 'send' ? 'TORRES' : 'ENVIAR UNIDADES';
-    $('#btn-speed').textContent = 'x' + G.speed; $('#btn-speed').setAttribute('aria-pressed', String(G.speed > 1));
-    $('#lvl-name').textContent = (V.view === 'me' ? 'TU CAMPO' : 'CAMPO DE ' + FAC_NAME(V.ai.fac).toUpperCase()) + ` · income +${V.me.income} en ${Math.ceil(V.tickT)} s`;
+    setText($('#wave-l'), 'RIVAL ♥'); setText($('#wave'), Math.ceil(V.ai.lives));
+    if (wb.hidden !== G.over) wb.hidden = G.over; wb.classList.remove('beat'); setText($('#wave-main'), V.view === 'me' ? 'RIVAL' : 'VOLVER'); setText($('#wave-sub'), V.view === 'me' ? 'ver su campo' : 'a tu campo');
+    setText($('#btn-mode'), G.trayMode === 'send' ? 'TORRES' : 'ENVIAR UNIDADES');
+    setText($('#btn-speed'), 'x' + G.speed); $('#btn-speed').setAttribute('aria-pressed', String(G.speed > 1));
+    setText($('#lvl-name'), (V.view === 'me' ? 'TU CAMPO' : 'CAMPO DE ' + FAC_NAME(V.ai.fac).toUpperCase()) + ` · income +${V.me.income} en ${Math.ceil(V.tickT)} s`);
     refreshTray(); if (G.sel) placePanel(); return;
   }
-  $('#wave-l').textContent = 'OLEADA'; $('#wave-main').textContent = '¡OLEADA!'; $('#wave').textContent = `${Math.min(G.wave, G.waves)}/${G.waves}`;
-  const can = !G.inWave && G.wave < G.waves && !G.over; wb.hidden = !can;
-  if (can) $('#wave-sub').textContent = G.wave === 0 ? '¡EMPEZAR!' : Math.ceil(G.nextT) + ' s · +' + Math.round(G.nextT * TD.earlyBonus);
-  $('#btn-speed').textContent = 'x' + G.speed; $('#btn-speed').setAttribute('aria-pressed', String(G.speed > 1));
-  $('#lvl-name').textContent = `${G.level.id} · ${G.level.name}` + passiveChip();
+  setText($('#wave-l'), 'OLEADA'); setText($('#wave-main'), '¡OLEADA!'); setText($('#wave'), `${Math.min(G.wave, G.waves)}/${G.waves}`);
+  const can = !G.inWave && G.wave < G.waves && !G.over; if (wb.hidden !== !can) wb.hidden = !can; wb.classList.add('beat');
+  if (can) setText($('#wave-sub'), G.wave === 0 ? '¡EMPEZAR!' : Math.ceil(G.nextT) + ' s · +' + Math.round(G.nextT * TD.earlyBonus));
+  setText($('#btn-speed'), 'x' + G.speed); $('#btn-speed').setAttribute('aria-pressed', String(G.speed > 1));
+  setText($('#lvl-name'), `${G.level.id} · ${G.level.name}` + passiveChip());
   refreshTray(); if (G.sel) placePanel();
 }
 // lo que lleva ganado la pasiva de la raza, junto al nombre del nivel
@@ -850,12 +850,22 @@ function passiveChip() {
 function placePanel() {
   const t = G.sel, p = $('#panel'), C = CFG.cards[t.k], D = tdef(t), max = t.lvl >= TD.maxLevel, c = max ? 0 : upCost(t), mate = fuseMate(t), canFuse = t.lvl < TD.fuseMax && !D.leader;
   p.hidden = false;
-  const R = Math.round(rangeOf(t)), dmg = D.kind === 'aura' ? `+${Math.round((D.aura.speed + 0.1 * (t.lvl - 1)) * 100)} % velocidad` : `${Math.round(dmgOf(t))} de daño`;
-  const html = `<div class="pn-t ol">${C.name} <small>NV ${t.lvl}</small></div><div class="pn-s">${dmg} · alcance ${R}${t.rage ? ` · <span class="rage">RABIA +${t.rage * 10} %</span>` : ''}${t.mut.id && t.mut.id !== 'normal' ? ` · <span class="rage">${t.mut.txt}</span>` : ''}</div>${canFuse && !mate ? '<div class="pn-h">Pega al lado otra igual y del mismo nivel para fusionarlas.</div>' : ''}
-    <div class="pn-b"><button class="btn-up" id="pn-up" ${max || G.gold < c ? 'disabled' : ''}>${max ? 'MÁXIMO' : 'MEJORAR<small>' + c + ' CAOS</small>'}</button>${mate ? `<button class="btn-fuse" id="pn-fuse">FUSIONAR<small>nivel ${t.lvl + 1}</small></button>` : ''}<button class="btn-sell" id="pn-sell">VENDER<small>+${sellOf(t)}</small></button></div>`;
-  if (p.dataset.h !== html) { p.innerHTML = html; p.dataset.h = html; $('#pn-up').onclick = () => { upgrade(t); hud(); }; $('#pn-sell').onclick = () => { sell(t); hidePanel(); hud(); }; const pf = $('#pn-fuse'); if (pf) pf.onclick = () => { fuse(t); hud(); }; }
+  // los botones solo se vuelven a crear cuando cambia la torre, su nivel o si se puede fusionar; el resto se actualiza sin tocarlos (si no, parpadean)
+  const key = [t.id, t.lvl, mate ? mate.id : 0, canFuse].join('|');
+  if (p.dataset.h !== key) {
+    p.dataset.h = key;
+    p.innerHTML = `<div class="pn-t ol">${C.name} <small>NV ${t.lvl}</small></div><div class="pn-s" id="pn-st"></div>${canFuse && !mate ? '<div class="pn-h">Pega al lado otra igual y del mismo nivel para fusionarlas.</div>' : ''}
+    <div class="pn-b"><button class="btn-up" id="pn-up">${max ? 'MÁXIMO' : 'MEJORAR<small>' + c + ' CAOS</small>'}</button>${mate ? `<button class="btn-fuse" id="pn-fuse">FUSIONAR<small>nivel ${t.lvl + 1}</small></button>` : ''}<button class="btn-sell" id="pn-sell">VENDER<small>+${sellOf(t)}</small></button></div>`;
+    $('#pn-up').onclick = () => { upgrade(t); hud(); }; $('#pn-sell').onclick = () => { sell(t); hidePanel(); hud(); }; const pf = $('#pn-fuse'); if (pf) pf.onclick = () => { fuse(t); hud(); };
+  }
+  const R = Math.round(rangeOf(t)), dmg = D.kind === 'aura' ? `+${Math.round((D.aura.speed + 0.1 * (t.lvl - 1)) * 100)} % velocidad` : `${Math.round(dmgOf(t) / (D.ramp ? 1 + D.ramp.step * (t.ramp || 0) : 1))} de daño`;
+  setHtml($('#pn-st'), `${dmg} · alcance ${R}${t.rage ? ` · <span class="rage">RABIA +${t.rage * 10} %</span>` : ''}${t.mut.id && t.mut.id !== 'normal' ? ` · <span class="rage">${t.mut.txt}</span>` : ''}`);
+  const up = $('#pn-up'), off = max || G.gold < c; if (up.disabled !== off) up.disabled = off;
   const x = clamp(t.x, 120, W - 120), y = t.y > 520 ? t.y - 160 : t.y + 40; p.style.left = x - 110 + 'px'; p.style.top = y + 'px';
 }
+// escribir en la página solo cuando el texto cambia de verdad
+function setText(el, v) { v = String(v); if (el.textContent !== v) el.textContent = v; }
+function setHtml(el, v) { if (el.dataset.v !== v) { el.dataset.v = v; el.innerHTML = v; } }
 function hidePanel() { $('#panel').hidden = true; $('#panel').dataset.h = ''; }
 
 // controles: arrastra una carta al campo o tócala y luego toca el campo
