@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fans of Rumble TD</title>
+<meta name="description" content="Fans of Rumble: Tower Defense. Microblizz quiere cerrar tus juegos favoritos: pon torres y defiende La Madriguera.">
+<meta name="theme-color" content="#150b21">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Luckiest+Guy&display=swap">
+<link rel="stylesheet" href="css/td.css">
+</head>
+<body>
+<div id="stage">
+  <canvas id="cv" aria-label="Campo de batalla"></canvas>
+  <div id="ui">
+    <header id="hud" hidden>
+      <button class="icon-btn" id="btn-pause" aria-label="Pausar"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="5" height="16" rx="1.5" fill="currentColor"/><rect x="14" y="4" width="5" height="16" rx="1.5" fill="currentColor"/></svg></button>
+      <div class="chip ol" title="Oro"><span class="coin"></span><span id="gold">0</span></div>
+      <div class="chip ol" title="Vidas de La Madriguera"><span class="heart">♥</span><span id="lives">20</span></div>
+      <div class="chip ol" title="Oleada">OLEADA <span id="wave">0/0</span></div>
+      <button class="icon-btn small ol" id="btn-speed" aria-label="Velocidad">x1</button>
+      <div id="lvl-name" class="ol"></div>
+    </header>
+    <div id="banner" class="ol-big"></div>
+    <button id="btn-wave" class="ol" hidden><span>¡OLEADA!</span><small id="wave-sub"></small></button>
+    <div id="panel" hidden></div>
+    <div id="info" hidden></div>
+    <footer id="tray" hidden><div id="cards"></div></footer>
+
+    <section class="screen" id="scr-title" hidden>
+      <button class="icon-btn btn-sound corner" aria-label="Silenciar sonido">🔊</button>
+      <div class="logo ol-big">FANS OF<br>RUMBLE</div>
+      <div class="logo-sub ol">TOWER DEFENSE</div>
+      <div class="title-art"><canvas id="title-art"></canvas><span class="vs ol-big">VS</span><canvas id="title-foe"></canvas></div>
+      <p class="story">Microblizz, una empresa millonaria, ha comprado el estudio que hacía tus juegos favoritos para despedir a todos y cerrarlos. Sus robots marchan hacia <b>La Madriguera</b>. Pon torres en el camino y que no pase ni un becario.</p>
+      <button class="btn-big ol" id="btn-play">JUGAR</button>
+      <p class="hint">Arrastra una carta al campo (o tócala y luego toca el campo). Toca una torre para mejorarla o venderla.</p>
+    </section>
+
+    <section class="screen" id="scr-map" hidden>
+      <div class="map-head"><button class="btn-ghost ol" id="map-back">‹</button><div class="ol-big map-t">CAMPAÑA</div><button class="icon-btn btn-sound" aria-label="Silenciar sonido">🔊</button></div>
+      <div id="map-team" class="ol"></div>
+      <div id="worlds"></div>
+    </section>
+
+    <section class="screen" id="scr-result" hidden>
+      <div id="res-title" class="ol-big"></div>
+      <div id="res-stars"></div>
+      <canvas id="res-art"></canvas>
+      <p id="res-msg"></p>
+      <div class="res-b"><button class="btn-big ol" id="res-next">SIGUIENTE</button><button class="btn-ghost ol" id="res-retry">REPETIR</button><button class="btn-ghost ol" id="res-map">MAPA</button></div>
+    </section>
+
+    <section class="modal" id="scr-pause" hidden>
+      <div class="box"><div class="ol-big">PAUSA</div><button class="btn-big ol" id="pz-go">SEGUIR</button><button class="btn-ghost ol" id="pz-retry">REPETIR</button><button class="btn-ghost ol" id="pz-map">SALIR AL MAPA</button><button class="icon-btn btn-sound" aria-label="Silenciar sonido">🔊</button></div>
+    </section>
+  </div>
+</div>
+<!-- Arte y números del juego original (Fans of Rumble), sin cambios -->
+<script src="js/00-utils.js"></script>
+<script src="js/vendor/01-config.js"></script>
+<script src="js/vendor/03-arte.js"></script>
+<!-- La defensa de torres -->
+<script src="js/td-data.js"></script>
+<script src="js/td-game.js"></script>
+</body>
+</html>
