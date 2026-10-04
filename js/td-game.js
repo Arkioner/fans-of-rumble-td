@@ -60,7 +60,7 @@ function reflow() {
 }
 // '' si se puede construir; si no, el motivo
 function whyNot(c, r) {
-  if (c < 0 || r < 0 || c >= COLS || r >= ROWS) return 'fuera';
+  if (!(c >= 0 && r >= 0 && c < COLS && r < ROWS)) return 'fuera';
   const i = idx(c, r);
   if (BLOCK[i]) return 'ocupada';
   if (isGate(c, r)) return 'puerta';
@@ -814,7 +814,7 @@ function buildTray() {
     b.innerHTML = `<canvas></canvas><span class="nm">${C.name}</span><span class="cost ol">${D.cost}</span>`;
     tray.appendChild(b);
     requestAnimationFrame(() => portrait(b.querySelector('canvas'), k, C.rarity === 'leader' || C.rarity === 'epic' ? 40 : 34));
-    b.addEventListener('pointerdown', e => { e.preventDefault(); if (G.vs && G.vs.view !== 'me') vsView('me'); G.sel = null; hidePanel(); if (G.over) return; if (D.leader && G.towers.some(t => t.k === k)) { showInfo(k); return; } if (G.place === k) { G.place = null; G.ghost = null; } else { G.place = k; G.ghost = null; G.dragging = true; showInfo(k); } refreshTray(); });
+    b.addEventListener('pointerdown', e => { e.preventDefault(); if (G.vs && G.vs.view !== 'me') vsView('me'); G.sel = null; hidePanel(); if (G.over) return; if (D.leader && G.towers.some(t => t.k === k)) { showInfo(k); return; } G.placeT = 0; if (G.place === k) { G.place = null; G.ghost = null; } else { G.place = k; G.ghost = null; G.dragging = true; showInfo(k); } refreshTray(); });
   }
 }
 function showInfo(k) { const C = CFG.cards[k], D = TOWERS[G.fac][k]; $('#info').innerHTML = `<b>${C.name}</b> · ${D.desc}`; $('#info').hidden = false; }
@@ -885,13 +885,19 @@ function ghostAt(p) {
 }
 function tryBuild(g) {
   if (!g) return false;
-  if (build(G.place, g.c, g.r)) { G.place = null; G.ghost = null; return true; }
+  const k = G.place;
+  if (build(k, g.c, g.r)) {
+    // la carta se queda elegida unos segundos por si quieres poner varias seguidas (si es el líder o no te llega el CAOS, se suelta)
+    const D = TOWERS[G.fac][k]; G.ghost = null;
+    if (D.leader || G.gold < D.cost) { G.place = null; G.placeT = 0; } else G.placeT = TD.keepSel;
+    return true;
+  }
   pop(g.x, g.y - 30, g.why ? GHOST_MSG[g.why] : 'FALTA CAOS', g.why ? '#ff4b5c' : '#ffcb3d', 14); return false;
 }
 addEventListener('pointermove', e => {
   if (G.screen !== 'play' || !G.place || !(G.dragging || e.pointerType === 'mouse')) return;
   const g = ghostAt(toField(e)); if (!g) { G.ghost = null; return; }
-  if (!G.ghost || G.ghost.c !== g.c || G.ghost.r !== g.r) G.ghost = g;
+  if (!G.ghost || G.ghost.c !== g.c || G.ghost.r !== g.r) { G.ghost = g; if (G.placeT > 0) G.placeT = TD.keepSel; }
 });
 addEventListener('pointerup', e => {
   if (G.screen !== 'play' || !G.dragging) return; G.dragging = false;
@@ -899,7 +905,12 @@ addEventListener('pointerup', e => {
 });
 cv.addEventListener('pointerdown', e => {
   if (G.screen !== 'play' || G.over || (G.vs && G.vs.view !== 'me')) return; const p = toField(e);
-  if (G.place) { const g = ghostAt(p); if (g) { G.ghost = g; tryBuild(g); hud(); } return; }
+  if (G.place) {
+    const g = ghostAt(p);
+    // con la carta aún elegida tras construir, tocar una torre ya puesta la selecciona en vez de dar error
+    if (g && g.why === 'ocupada' && G.placeT > 0) { G.place = null; G.ghost = null; G.placeT = 0; refreshTray(); }
+    else { if (g) { G.ghost = g; tryBuild(g); hud(); } return; }
+  }
   const pc = p.y >= GY && p.y < GY1 ? cellOf(p.x, p.y) : -1;
   const t = G.towers.find(o => o.cell === pc) || G.towers.find(o => Math.hypot(o.x - p.x, o.y - 20 - p.y) < 22);
   G.sel = t && t !== G.sel ? t : null; if (G.sel) placePanel(); else hidePanel();
@@ -975,6 +986,7 @@ function frame(now) {
   if (G.screen === 'play' && !G.paused && !G.over) { const steps = G.speed; for (let i = 0; i < steps && !G.over; i++) (G.vs ? vsUpdate : update)(dt); }
   else if (G.screen === 'play' && G.over) { const d2 = dt; for (const q of G.parts) { q.t += d2; } G.parts = G.parts.filter(q => q.t < q.life); for (const n of G.nums) { n.t += d2; n.y -= d2 * 28; } G.nums = G.nums.filter(n => n.t < n.life); }
   draw();
+  if (G.placeT > 0) { G.placeT -= dt; if (G.placeT <= 0 && G.place) { G.place = null; G.ghost = null; if (G.screen === 'play') refreshTray(); } }
   hudT -= dt; if (G.screen === 'play' && hudT <= 0) { hudT = 0.1; hud(); }
   requestAnimationFrame(frame);
 }

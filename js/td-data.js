@@ -12,6 +12,7 @@ const TD = {
   foeHeal: 1,             // cuánto curan los enemigos sanadores respecto al original
   baseAtkCd: 1,           // cada enemigo pega a La Madriguera una vez por segundo
   sellBack: 0.6,          // al vender una torre recuperas el 60 % de lo invertido
+  keepSel: 4,             // segundos que la carta sigue elegida después de poner una torre, para poner varias seguidas
   maxLevel: 3,            // hasta aquí se mejora con oro
   fuseMax: 5,             // los niveles 4 y 5 solo se consiguen fusionando dos torres iguales que se tocan
   upCost: [0, 0.8, 1.2],  // mejorar a nivel 2 cuesta el 80 % del precio; a nivel 3, el 120 %

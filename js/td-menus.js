@@ -391,6 +391,10 @@ function toast(msg, good) { const t = $('#toast'); t.textContent = msg; t.classL
    Con cada versión nueva hay que subir VERSION (en td-meta.js) y poner aquí arriba del todo lo que cambia.
    ========================================================= */
 const NEWS = [
+  { v: '0.8.1', real: [
+      '<b>Poner varias torres seguidas</b>: al colocar una torre, su carta se queda elegida unos segundos. Toca otra casilla y pones otra igual, sin volver a la bandeja.',
+      'Se suelta sola a los 4 segundos, si no te llega el CAOS para otra, o si tocas la carta o una torre ya puesta.'],
+    joke: ['Microblizz estudia cobrar por cada toque que te ahorras.'] },
   { v: '0.8.0', real: [
       '<b>Opciones como las del original</b>: música del menú a elegir (la de cualquier raza o jefe), avisos encima o en una caja, chapas, sangre y chat.',
       '<b>Chat en directo</b>: los comentarios falsos del original, durante la partida. Se quita en Opciones.',
