@@ -38,7 +38,26 @@ Cada raza tiene la misma escalera de precios: una torre barata para levantar mur
 
 ## Campaña
 
-De momento solo se puede jugar el mundo 1 (Oficinas de Microblizz: 4 niveles y el jefe SurvivalBot). Los otros 11 mundos de la historia aparecen en el mapa como bloqueados.
+Los 12 mundos de la historia del original, con sus nombres de nivel y sus jefes. Cada mundo tiene 4 niveles (el 4.º trae al jefe en la última oleada) y se abre al terminar el anterior.
+
+| Mundo | Lugar | Enemigos | Su truco | Jefe |
+|---|---|---|---|---|
+| 1 | Oficinas de Microblizz | Microblizz | Ninguno | SurvivalBot |
+| 2 | Cementerio de juegos | No-Muertos corrompidos | Cada enemigo se levanta una vez con el 60 % de su vida | NecroLord corrupto |
+| 3 | Plató Abandonado | Streamers corrompidos | Corren un 20 % más | StreamKing corrupto |
+| 4 | Olimpo Abandonado | Héroes corrompidos | Se hacen más duros con cada oleada | EpicChampion corrupto |
+| 5 | Sector Neón | Ciberpunks corrompidos | Escudo del 25 % que se recarga | CyberMarine corrupto |
+| 6 | El Foro Infinito | Memes corrompidos | Mutación al azar | MemeLord corrupto |
+| 7 | Torre de Microblizz | Microblizz | Ninguno | El CEO de Microblizz |
+| 8 | El Sótano de Microblizz | Olvidados corrompidos | Tus torres tardan 2 s en dispararles | VikingoPerdido corrupto |
+| 9 | Tiendas sin discos | Phony | Cada golpe a tu base te quita 2 de oro | PayStation sin lector |
+| 10 | La LAN Party | Gamers corrompidos | Mucha más vida | ProGamer corrupto |
+| 11 | Estudios Phony | Cultura Pop corrompida | 3 de cada 10 vuelven en versión «2» | LaDirectora corrupta |
+| 12 | Sede de Phony | Phony | Cada golpe a tu base te quita 2 de oro | El Presidente de Phony |
+
+Los jefes dejan sin atacar a tu torre más cercana, sacan refuerzos, o las dos cosas. Tu base también se defiende sola: dispara a los enemigos que la están golpeando, así que un enemigo suelto no te hace perder.
+
+Los niveles salen de una regla (`LEVEL_RULE` en `js/td-data.js`): según avanzas hay más oleadas, más tipos de enemigo, más enemigos por oleada, y su vida crece más deprisa. También empiezas con un poco más de oro en cada mundo.
 
 ## Archivos
 
