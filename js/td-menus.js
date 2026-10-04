@@ -391,6 +391,9 @@ function toast(msg, good) { const t = $('#toast'); t.textContent = msg; t.classL
    Con cada versión nueva hay que subir VERSION (en td-meta.js) y poner aquí arriba del todo lo que cambia.
    ========================================================= */
 const NEWS = [
+  { v: '0.6.1', real: [
+      '<b>Arreglado el parpadeo de las cartas de torres</b>: durante la partida se apagaban y encendían solas varias veces por segundo. Ahora solo se apagan cuando no te llega el CAOS.'],
+    joke: ['Microblizz aclara que el parpadeo era una función prémium de discoteca. Se retira por falta de suscriptores.'] },
   { v: '0.6.0', real: [
       '<b>Menús como los del original</b>: colección, inventario, gashapón con su máquina de cápsulas, tienda y horas extra tienen ahora su mismo aspecto.',
       '<b>Informe de parches</b>: esta ventana. Sale una vez con cada versión y puedes volver a verla en NOVEDADES.',

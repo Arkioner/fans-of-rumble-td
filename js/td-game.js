@@ -816,7 +816,8 @@ function buildTray() {
 }
 function showInfo(k) { const C = CFG.cards[k], D = TOWERS[G.fac][k]; $('#info').innerHTML = `<b>${C.name}</b> · ${D.desc}`; $('#info').hidden = false; }
 function refreshTray() {
-  for (const b of document.querySelectorAll('#cards .card')) { const k = b.dataset.k; if (b.dataset.send) { const l = G.vs.me.ulvl[k] || 1; b.classList.toggle('off', G.gold < sendCost(k)); b.querySelector('.upg').classList.toggle('no', l < TD.maxLevel && G.gold < unitUpCost(k, l)); continue; } const D = TOWERS[G.fac][k]; const used = D.leader && G.towers.some(t => t.k === k); b.classList.toggle('off', G.gold < D.cost || used); b.classList.toggle('sel', G.place === k); b.classList.toggle('used', !!used); }
+  // ojo: classList.toggle con «undefined» alterna la clase en cada llamada (así parpadeaban las cartas): el segundo valor tiene que ser siempre true o false
+  for (const b of document.querySelectorAll('#cards .card')) { const k = b.dataset.k; if (b.dataset.send) { const l = G.vs.me.ulvl[k] || 1; b.classList.toggle('off', G.gold < sendCost(k)); b.querySelector('.upg').classList.toggle('no', l < TD.maxLevel && G.gold < unitUpCost(k, l)); continue; } const D = TOWERS[G.fac][k]; const used = !!D.leader && G.towers.some(t => t.k === k); b.classList.toggle('off', G.gold < D.cost || used); b.classList.toggle('sel', G.place === k); b.classList.toggle('used', !!used); }
   if (!G.place) $('#info').hidden = true;
 }
 function hud() {
