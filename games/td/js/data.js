@@ -2,7 +2,7 @@
 'use strict';
 /* =========================================================
    Todo lo que se puede equilibrar vive aquí.
-   Los nombres, el arte y los números base salen de js/vendor/01-config.js (el juego original):
+   Los nombres, el arte y los números base salen de core/js/vendor/01-config.js (el juego original):
    aquí solo se convierten en torres y oleadas.
    ========================================================= */
 const TD = {

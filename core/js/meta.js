@@ -1,6 +1,6 @@
 // Fans of Rumble TD · Progreso fuera de la partida: datos y reglas (oro y gemas, niveles, habilidades, equipo, gashapón, tienda y horas extra).
 // Mismos nombres, rarezas, calidades, precios y forma de guardar que el original (js/02-progresion.js), adaptados a la defensa de torres.
-// Las pantallas están en js/td-menus.js y js/td-idle.js.
+// Las pantallas están en menus.js e idle.js.
 'use strict';
 /* =========================================================
    Cada carta tiene DOS FACETAS que comparten nivel, habilidad y equipo:
@@ -8,7 +8,7 @@
      · UNIDAD (U): cuando la envías al rival en el modo VS o la pones a hacer horas extra.
    Casi todo lo que te equipas mejora solo una faceta, así que hay que elegir cuál prefieres.
    ========================================================= */
-const VERSION = '0.9.0';
+const VERSION = '0.9.1';
 const ECON = {
   lvlStep: 0.06, maxLvl: 10,                                                     // +6 % por nivel: daño de la torre y vida de la unidad
   xpNeed:   [0, 50, 100, 175, 300, 500, 800, 1300, 2000, 3200],                  // XP para pasar del nivel i al i+1

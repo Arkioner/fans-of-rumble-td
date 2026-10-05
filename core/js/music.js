@@ -1,4 +1,4 @@
-// Fans of Rumble TD · Música: el mismo motor y las mismas canciones del original (js/vendor/05-musica.js), con un ajuste:
+// Fans of Rumble TD · Música: el mismo motor y las mismas canciones del original (vendor/05-musica.js), con un ajuste:
 // cuando la canción ya ha sonado entera una vez, en vez de volver a empezar igual sigue subiendo de tono para siempre
 // con la paradoja de Shepard, así que no se nota el momento en que se repite.
 'use strict';

@@ -1,6 +1,6 @@
-"""Genera js/td-idle.js a partir de js/13-horas-extra.js del original, con los cambios mínimos para la defensa de torres."""
+"""Genera core/js/idle.js a partir de js/13-horas-extra.js del original, con los cambios mínimos para la defensa de torres."""
 SRC = '../fans-of-rumble/js/13-horas-extra.js'   # el juego original, clonado al lado de este
-OUT = 'js/td-idle.js'
+OUT = 'core/js/idle.js'
 s = open(SRC, encoding='utf-8').read()
 
 def rep(a, b, n=1):
@@ -17,7 +17,7 @@ def cut(start, end):
 rep("// Fans of Rumble · HORAS EXTRA: el minijuego del menú\n'use strict';\n",
     "// Fans of Rumble TD · HORAS EXTRA: el minijuego del menú.\n"
     "// Es js/13-horas-extra.js del original casi tal cual: la escena, los números y las ventanas son los suyos.\n"
-    "// Cambia de dónde sale el poder del líder (aquí, de su faceta de UNIDAD: ver idlePower en td-meta.js) y no hay anuncios.\n"
+    "// Cambia de dónde sale el poder del líder (aquí, de su faceta de UNIDAD: ver idlePower en meta.js) y no hay anuncios.\n"
     "'use strict';\n"
     "/* ---------- lo que el original tenía en otros archivos ---------- */\n"
     "const VIEW = { get sc() { return SCALE; } }, PROJ = {};\n"

@@ -1,6 +1,6 @@
 // Fans of Rumble TD · Menús: cartera, colección, inventario, gashapón, tienda y novedades.
 // Es el código de js/09-menus.js y js/11-logros.js del original, adaptado: aquí todas las cartas llevan equipo (no solo el líder)
-// y cada objeto dice si mejora la TORRE o la UNIDAD. Los estilos son los del original (css/menus.css).
+// y cada objeto dice si mejora la TORRE o la UNIDAD. Los estilos son los del original (core/css/menus.css).
 'use strict';
 /* ---------- lo que el original tenía repartido por otros archivos ---------- */
 const play = n => sfx({ select: 'place', deny: 'womp', levelup: 'up', win: 'win', crown: 'coin', roll: 'horn', despido: 'womp', sad: 'womp' }[n] || n);
@@ -388,9 +388,13 @@ function toast(msg, good) { const t = $('#toast'); t.textContent = msg; t.classL
 
 /* =========================================================
    NOVEDADES: el informe de cada parche. Sale solo la primera vez que abres el juego después de actualizarse.
-   Con cada versión nueva hay que subir VERSION (en td-meta.js) y poner aquí arriba del todo lo que cambia.
+   Con cada versión nueva hay que subir VERSION (en meta.js) y poner aquí arriba del todo lo que cambia.
    ========================================================= */
 const NEWS = [
+  { v: '0.9.1', real: [
+      'Cambio interno: el juego se ha ordenado por dentro para compartir razas, cartas, objetos, menús y música con los próximos juegos de Fans of Rumble.',
+      'Tu progreso se conserva. Si lo tenías <b>instalado como app</b> y no abre bien, desinstálalo y vuelve a instalarlo desde Opciones.'],
+    joke: ['Microblizz llama a esto «sinergias». Normalmente después despide a alguien.'] },
   { v: '0.9.0', real: [
       '<b>Menús como los del original</b>: la portada, la campaña, la pantalla de antes de jugar, la pausa y el final de la partida tienen ahora su mismo aspecto.',
       '<b>Antes de jugar</b> eliges tu facción en una pantalla propia, con su pasiva. En el modo VS eliges ahí también el rival.',

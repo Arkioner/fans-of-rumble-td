@@ -1,7 +1,7 @@
 """Saca de css/estilos.css del original las reglas de los menús (cartera, colección, inventario, gashapón, tienda, horas extra, novedades)."""
 import re, sys
 SRC = '../fans-of-rumble/css/estilos.css'   # el juego original, clonado al lado de este
-OUT = 'css/menus.css'
+OUT = 'core/css/menus.css'
 css = open(SRC, encoding='utf-8').read()
 
 TOKENS = ['.wallet', '.wal', '.home-feature', '.feat', '.home-grid', '.home-tile', '.dotbadge', '.idle', '#idle', '.ib-', '.rw-chip', '.idlebox', '.scr-head', '.h2', '.fac-tab', '.passive-box', '.scroll-list',
@@ -55,7 +55,7 @@ used = set(re.findall(r'animation(?:-name)?:\s*([\w-]+)', body))
 kfs = [r for t, n, r in kept if t == 'kf' and n in used]
 head = ("/* Fans of Rumble TD · Estilos de los menús: reglas sacadas de css/estilos.css del juego original (sin cambiar)\n"
         "   para que la colección, el inventario, el gashapón, la tienda, las horas extra y las novedades se vean igual.\n"
-        "   Se genera con una herramienta; los ajustes propios de la defensa de torres van en td.css. */\n")
+        "   Se genera con una herramienta; los ajustes propios de cada juego van en su css (el del TD, en games/td/css/td.css). */\n")
 open(OUT, 'w', encoding='utf-8', newline='\n').write(head + body + '\n' + '\n'.join(kfs) + '\n')
 print('reglas', sum(1 for t, n, r in kept if t == 'rule'), 'keyframes', len(kfs), 'bytes', len(body))
 print('animaciones usadas', sorted(used))
