@@ -1,4 +1,4 @@
-// Fans of Rumble TD · Motor: oleadas, torres, dibujo y controles
+// Fans of TD · Motor: oleadas, torres, dibujo y controles
 'use strict';
 /* =========================================================
    ESTADO

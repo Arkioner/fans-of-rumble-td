@@ -1,4 +1,4 @@
-// Fans of Rumble TD · HORAS EXTRA: el minijuego del menú.
+// Fans Of · HORAS EXTRA: el minijuego del menú.
 // Es js/13-horas-extra.js del original casi tal cual: la escena, los números y las ventanas son los suyos.
 // Cambia de dónde sale el poder del líder (aquí, de su faceta de UNIDAD: ver idlePower en meta.js) y no hay anuncios.
 'use strict';

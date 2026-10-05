@@ -1,4 +1,4 @@
-// Fans of Rumble TD · Lo que faltaba de las Opciones del original: música del menú, avisos en la caja, chapas, sangre,
+// Fans of TD · Lo que faltaba de las Opciones del original: música del menú, avisos en la caja, chapas, sangre,
 // chat en directo y tutorial. Se engancha al motor desde fuera, sin tocar sus funciones.
 'use strict';
 if (SAVE.tut == null) SAVE.tut = { done: Object.keys(SAVE.stars || {}).length > 0 };   // quien ya ha ganado algún nivel no necesita la partida guiada

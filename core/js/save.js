@@ -1,4 +1,4 @@
-// Fans of Rumble · Guardado: una sola partida guardada en el navegador, compartida por todos los juegos de esta web
+// Fans Of · Guardado: una sola partida guardada en el navegador, compartida por todos los juegos de esta web
 // (oro, gemas, niveles de carta, inventario y opciones son los mismos en todos; cada juego añade sus propios campos).
 'use strict';
 const SAVE_KEY = 'fortd-save';

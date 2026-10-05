@@ -15,7 +15,7 @@ def cut(start, end):
     s = s[:i] + s[j:]
 
 rep("// Fans of Rumble · HORAS EXTRA: el minijuego del menú\n'use strict';\n",
-    "// Fans of Rumble TD · HORAS EXTRA: el minijuego del menú.\n"
+    "// Fans Of · HORAS EXTRA: el minijuego del menú.\n"
     "// Es js/13-horas-extra.js del original casi tal cual: la escena, los números y las ventanas son los suyos.\n"
     "// Cambia de dónde sale el poder del líder (aquí, de su faceta de UNIDAD: ver idlePower en meta.js) y no hay anuncios.\n"
     "'use strict';\n"

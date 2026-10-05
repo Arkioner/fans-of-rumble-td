@@ -53,7 +53,7 @@ for rule in split_rules(css):
 body = '\n'.join(r for t, n, r in kept if t == 'rule')
 used = set(re.findall(r'animation(?:-name)?:\s*([\w-]+)', body))
 kfs = [r for t, n, r in kept if t == 'kf' and n in used]
-head = ("/* Fans of Rumble TD · Estilos de los menús: reglas sacadas de css/estilos.css del juego original (sin cambiar)\n"
+head = ("/* Fans Of · Estilos de los menús: reglas sacadas de css/estilos.css del juego original (sin cambiar)\n"
         "   para que la colección, el inventario, el gashapón, la tienda, las horas extra y las novedades se vean igual.\n"
         "   Se genera con una herramienta; los ajustes propios de cada juego van en su css (el del TD, en games/td/css/td.css). */\n")
 open(OUT, 'w', encoding='utf-8', newline='\n').write(head + body + '\n' + '\n'.join(kfs) + '\n')

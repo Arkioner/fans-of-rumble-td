@@ -1,4 +1,4 @@
-// Fans of Rumble TD · Datos: torres de cada facción, enemigos y mundos (en el orden de la historia del original)
+// Fans of TD · Datos: torres de cada facción, enemigos y mundos (en el orden de la historia del original)
 'use strict';
 /* =========================================================
    Todo lo que se puede equilibrar vive aquí.

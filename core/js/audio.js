@@ -1,4 +1,4 @@
-// Fans of Rumble · Efectos de sonido sintetizados, comunes a todos los juegos. La música va aparte, en music.js.
+// Fans Of · Efectos de sonido sintetizados, comunes a todos los juegos. La música va aparte, en music.js.
 'use strict';
 /* =========================================================
    SONIDO (sintetizado, como en el original)

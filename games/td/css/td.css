@@ -1,4 +1,4 @@
-/* Fans of Rumble TD · Aspecto propio de la defensa de torres: marcador, bandeja de cartas, panel de la torre y sus ajustes
+/* Fans of TD · Aspecto propio de la defensa de torres: marcador, bandeja de cartas, panel de la torre y sus ajustes
    sobre los menús comunes. Los colores y la base están en core/css/base.css; los menús, en core/css/menus.css. */
 /* ---------- HUD ---------- */
 #hud { position: absolute; left: 0; top: 0; width: 540px; height: 64px; box-sizing: border-box; padding: 8px 10px; display: flex; align-items: center; gap: 7px; flex-wrap: wrap;

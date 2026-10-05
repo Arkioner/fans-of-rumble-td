@@ -1,4 +1,4 @@
-// Fans of Rumble TD · Menús: cartera, colección, inventario, gashapón, tienda y novedades.
+// Fans Of · Menús: cartera, colección, inventario, gashapón, tienda y novedades.
 // Es el código de js/09-menus.js y js/11-logros.js del original, adaptado: aquí todas las cartas llevan equipo (no solo el líder)
 // y cada objeto dice si mejora la TORRE o la UNIDAD. Los estilos son los del original (core/css/menus.css).
 'use strict';
@@ -391,6 +391,10 @@ function toast(msg, good) { const t = $('#toast'); t.textContent = msg; t.classL
    Con cada versión nueva hay que subir VERSION (en meta.js) y poner aquí arriba del todo lo que cambia.
    ========================================================= */
 const NEWS = [
+  { v: '0.9.2', real: [
+      '<b>El juego se llama Fans of TD</b>. La serie es «Fans Of»: el primero fue Fans of Rumble y este es su defensa de torres.',
+      'Si lo tienes instalado como app, el nombre nuevo sale al reinstalarlo.'],
+    joke: ['Microblizz ha registrado «Fans Of» en 40 países. Por si acaso.'] },
   { v: '0.9.1', real: [
       'Cambio interno: el juego se ha ordenado por dentro para compartir razas, cartas, objetos, menús y música con los próximos juegos de Fans of Rumble.',
       'Tu progreso se conserva. Si lo tenías <b>instalado como app</b> y no abre bien, desinstálalo y vuelve a instalarlo desde Opciones.'],
@@ -479,7 +483,7 @@ const optOn = k => SAVE[k] !== false;   // números de daño y temblor vienen ac
 function openOptions() {
   show('scr-options'); updateWallets();
   $('#opt-vol').value = Math.round((SAVE.vol == null ? 1 : SAVE.vol) * 100); $('#opt-mus').value = Math.round((SAVE.mus == null ? 1 : SAVE.mus) * 100);
-  optButtons(); $('#save-code').value = ''; $('#opt-ver').textContent = 'Fans of Rumble TD · versión ' + VERSION;
+  optButtons(); $('#save-code').value = ''; $('#opt-ver').textContent = document.title + ' · versión ' + VERSION;   // cada juego pone su nombre en el título de su página
 }
 function optButtons() {
   $('#btn-nums').textContent = optOn('nums') ? 'SÍ' : 'NO'; $('#btn-shake').textContent = optOn('shake') ? 'SÍ' : 'NO';

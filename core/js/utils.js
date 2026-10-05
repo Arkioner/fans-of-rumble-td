@@ -1,4 +1,4 @@
-// Fans of Rumble TD · Utilidades que el arte original necesita (copiadas de js/02-progresion.js de Fans of Rumble)
+// Fans Of · Utilidades que el arte original necesita (copiadas de js/02-progresion.js de Fans of Rumble)
 'use strict';
 const OL = '#20102c';
 const FONT_D = '"Luckiest Guy", "Arial Black", Impact, sans-serif';

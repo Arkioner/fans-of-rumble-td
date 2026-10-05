@@ -1,4 +1,4 @@
-// Fans of Rumble TD · Portada, campaña, pantalla previa, cómo se juega, pausa y final de partida.
+// Fans of TD · Portada, campaña, pantalla previa, cómo se juega, pausa y final de partida.
 // Tienen la misma estructura y las mismas clases que en el original (index.html y js/09-menus.js), para que se vean igual.
 'use strict';
 const enemyLabel = f => (isCorp(f) ? CORP[f] : FACTIONS[f].corr || FACTIONS[f].name + ' corrompidos');

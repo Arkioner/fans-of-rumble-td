@@ -1,4 +1,4 @@
-// Fans of Rumble TD · Las canciones del juego original: copiadas sin cambios de js/05-audio.js de Fans of Rumble (escalas, secuencias y los 25 temas).
+// Fans Of · Las canciones del juego original: copiadas sin cambios de js/05-audio.js de Fans of Rumble (escalas, secuencias y los 25 temas).
 'use strict';
 /* =========================================================
    MUSIC (synthesised, no files): menu, one theme per faction, boss, last-minute rush, win / lose jingles

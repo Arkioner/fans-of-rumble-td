@@ -1,4 +1,4 @@
-/* Fans of Rumble TD · Estilos de los menús: reglas sacadas de css/estilos.css del juego original (sin cambiar)
+/* Fans Of · Estilos de los menús: reglas sacadas de css/estilos.css del juego original (sin cambiar)
    para que la colección, el inventario, el gashapón, la tienda, las horas extra y las novedades se vean igual.
    Se genera con una herramienta; los ajustes propios de cada juego van en su css (el del TD, en games/td/css/td.css). */
 .passive-box.undead { background: linear-gradient(100deg, #1f9c7a 0%, var(--tray) 62%); }

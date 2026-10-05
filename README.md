@@ -1,6 +1,6 @@
-# Fans of Rumble · juegos
+# Fans Of · juegos
 
-Un solo repositorio para los juegos hechos con el mundo de [Fans of Rumble](https://github.com/jdanielhl1984-commits/fans-of-rumble): mismas razas, cartas, objetos, menús y música, y una carpeta por juego con sus propias reglas. Se publica entero, de una vez, en GitHub Pages.
+Un solo repositorio para la serie **Fans Of**: los juegos hechos con el mundo de [Fans of Rumble](https://github.com/jdanielhl1984-commits/fans-of-rumble): mismas razas, cartas, objetos, menús y música, y una carpeta por juego con sus propias reglas. Se publica entero, de una vez, en GitHub Pages.
 
 Se juega en https://arkioner.github.io/fans-of-rumble-td/
 
@@ -25,7 +25,7 @@ core/                 LO COMÚN A TODOS LOS JUEGOS
 games/
   rumble/               FANS OF RUMBLE, el juego original (ver games/rumble/README.md): sus archivos sin cambios,
                         salvo que 01-config.js, 03-arte.js y los iconos los carga de core/
-  td/                   FANS OF RUMBLE TD (su documentación está en games/td/README.md)
+  td/                   FANS OF TD (su documentación está en games/td/README.md)
     index.html            la página del juego: carga core/ y luego lo suyo
     manifest.webmanifest  para instalarlo como app
     sw.js                 su modo sin conexión

@@ -1,4 +1,4 @@
-// Fans of Rumble TD · modo sin conexión (igual que en el original)
+// Fans of TD · modo sin conexión (igual que en el original)
 // El juego (su carpeta y lo común de core/) se pide primero a internet para tener siempre la última versión;
 // si no hay conexión, se usa la copia guardada. Iconos y letras se guardan la primera vez.
 // La versión llega en la dirección con la que se registra (sw.js?v=…), así que no hay que tocar este archivo al publicar.
