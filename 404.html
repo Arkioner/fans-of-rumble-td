@@ -11,7 +11,8 @@
 <body>
 <p>Fans Of se ha mudado.<br><a href="https://microblizz.github.io/FansOf/">Sigue aquí: https://microblizz.github.io/FansOf/</a></p>
 <script>
-location.replace('https://microblizz.github.io/FansOf/');
+var p = location.pathname.replace(/^\/fans-of-rumble-td\/?/, '');
+location.replace('https://microblizz.github.io/FansOf/' + (/^games\/(td|rumble)\//.test(p) ? p.match(/^games\/(td|rumble)\//)[0] : ''));
 </script>
 </body>
 </html>
