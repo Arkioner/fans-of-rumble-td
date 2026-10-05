@@ -7,7 +7,7 @@ Se juega en https://arkioner.github.io/fans-of-rumble-td/
 ## Estructura
 
 ```
-index.html            la entrada de la web: hoy lleva directo al único juego; cuando haya más será el selector
+index.html            la entrada de la web: el selector de juegos
 sw.js                 limpia el modo sin conexión que el TD tenía antes en la raíz (no cachea nada)
 core/                 LO COMÚN A TODOS LOS JUEGOS
   css/base.css          colores, letras, contornos, marco de la pantalla y capa de interfaz de 540 x 960
@@ -23,6 +23,8 @@ core/                 LO COMÚN A TODOS LOS JUEGOS
   js/menus.js           pantallas comunes: colección, inventario, gashapón, tienda, opciones, novedades e instalar
   js/idle.js            horas extra; se genera con herramientas/horas_extra.py
 games/
+  rumble/               FANS OF RUMBLE, el juego original (ver games/rumble/README.md): sus archivos sin cambios,
+                        salvo que 01-config.js, 03-arte.js y los iconos los carga de core/
   td/                   FANS OF RUMBLE TD (su documentación está en games/td/README.md)
     index.html            la página del juego: carga core/ y luego lo suyo
     manifest.webmanifest  para instalarlo como app
@@ -32,7 +34,7 @@ games/
     js/game.js            el motor: casillas y camino, oleadas, torres, modo VS, dibujo y controles
     js/pantallas.js       portada, campaña, antes de jugar, pausa y final
     js/extras.js          chat en directo, caja de avisos, tutorial y sus opciones
-herramientas/           scripts que regeneran archivos de core/ a partir del juego original clonado al lado
+herramientas/           scripts que regeneran archivos de core/ a partir del original (games/rumble/)
 ```
 
 ## Qué va en cada sitio
@@ -41,13 +43,15 @@ herramientas/           scripts que regeneran archivos de core/ a partir del jue
 - **games/<juego>/** tiene el bucle de juego y las reglas de ese modo: qué hace cada carta en ese juego, sus niveles, su marcador y sus pantallas de partida.
 - El progreso se guarda una sola vez por navegador: el oro, las gemas, los niveles y el inventario son los mismos en todos los juegos.
 
+El original (`games/rumble/`) todavía no usa el progreso, el guardado, los menús ni el sonido de `core/`: tiene los suyos, de los que salieron los de core. Unificarlos es el siguiente paso.
+
 Dos cosas que hoy están en core y son todavía del TD: `js/meta.js` describe cada objeto con dos facetas (torre y unidad), y `js/menus.js` las enseña así. Cuando llegue el segundo juego habrá que decidir cómo las lee él.
 
 ## Añadir un juego
 
 1. Crea `games/<nombre>/` con su `index.html`, que cargue primero lo de `core/` (copia el orden de `games/td/index.html`) y después sus propios `js/` y `css/`.
 2. Si se va a instalar como app, dale su `manifest.webmanifest` y su `sw.js` (copia los del TD y cambia la lista de archivos).
-3. Convierte el `index.html` de la raíz en un selector con un enlace a cada juego.
+3. Añade su tarjeta al selector, el `index.html` de la raíz.
 
 ## Publicar
 

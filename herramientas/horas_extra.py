@@ -1,5 +1,5 @@
 """Genera core/js/idle.js a partir de js/13-horas-extra.js del original, con los cambios mínimos para la defensa de torres."""
-SRC = '../fans-of-rumble/js/13-horas-extra.js'   # el juego original, clonado al lado de este
+SRC = 'games/rumble/js/13-horas-extra.js'   # el juego original, que está en este mismo repositorio
 OUT = 'core/js/idle.js'
 s = open(SRC, encoding='utf-8').read()
 

@@ -2,16 +2,45 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Fans of Rumble</title>
+<meta name="description" content="Los juegos de Fans of Rumble: Microblizz ha comprado tus juegos favoritos para cerrarlos. Elige cómo pararle los pies.">
 <meta name="theme-color" content="#150b21">
 <link rel="icon" type="image/png" href="core/img/icon-192.png">
-<!-- De momento solo hay un juego, así que la portada lleva directo a él. Cuando haya más, esta página será el selector. -->
-<meta http-equiv="refresh" content="0; url=games/td/">
-<style>body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #150b21; color: #fff6ea; font: 700 18px system-ui, sans-serif; } a { color: #ffcb3d; }</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Luckiest+Guy&display=swap">
+<link rel="stylesheet" href="core/css/base.css">
+<style>
+  /* la entrada de la web: una tarjeta por juego, con los colores y las letras de core */
+  body { overflow: auto; touch-action: auto; align-items: flex-start; }
+  main { width: 100%; max-width: 540px; box-sizing: border-box; padding: 34px 20px 40px; display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; }
+  h1 { font-family: var(--font-display); font-weight: 400; line-height: 0.9; margin: 0; }
+  h1 .l1 { display: block; font-size: 42px; letter-spacing: 2px; }
+  h1 .l2 { display: block; font-size: 96px; color: var(--player); transform: rotate(-4deg); margin-top: 6px; }
+  p.sub { font-weight: 800; font-size: 18px; color: var(--ink-dim); margin: 0 0 6px; }
+  a.game { display: block; width: 100%; box-sizing: border-box; text-decoration: none; color: var(--ink); text-align: left; border: 4px solid var(--outline); border-radius: 20px; padding: 16px 18px 14px; background: linear-gradient(110deg, var(--wc) 0%, var(--tray) 72%); box-shadow: 0 6px 0 var(--outline); }
+  a.game:active { transform: translateY(3px); box-shadow: 0 3px 0 var(--outline); }
+  a.game:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+  a.game b { display: block; font-family: var(--font-display); font-weight: 400; font-size: 30px; line-height: 1; }
+  a.game span { display: block; font-size: 15px; font-weight: 700; line-height: 1.3; margin-top: 6px; color: var(--ink-dim); }
+  a.game i { display: inline-block; font-style: normal; font-family: var(--font-display); font-size: 17px; margin-top: 10px; padding: 8px 16px 4px; border-radius: 12px; border: 3px solid var(--outline); background: linear-gradient(to bottom, var(--player-lite), var(--player)); color: var(--ink); }
+</style>
 </head>
 <body>
-<p><a href="games/td/">Fans of Rumble TD</a></p>
-<script>location.replace('games/td/' + location.search + location.hash);</script>
+<main>
+  <h1><span class="l1 ol">FANS OF</span><span class="l2 ol-big">RUMBLE</span></h1>
+  <p class="sub">Elige juego</p>
+  <a class="game" href="games/rumble/" style="--wc: #8a3a12">
+    <b class="ol">FANS OF RUMBLE</b>
+    <span>El original. Saca tus cartas al campo, cruza el río y tira la sede de Microblizz antes de que acabe el tiempo.</span>
+    <i class="ol">JUGAR</i>
+  </a>
+  <a class="game" href="games/td/" style="--wc: #1d3f8a">
+    <b class="ol">TOWER DEFENSE</b>
+    <span>Monta un laberinto de torres para que los robots no lleguen a tu base. Con campaña de 12 mundos y modo VS.</span>
+    <i class="ol">JUGAR</i>
+  </a>
+</main>
 </body>
 </html>

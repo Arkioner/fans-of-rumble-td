@@ -1,6 +1,6 @@
 """Saca de css/estilos.css del original las reglas de los menús (cartera, colección, inventario, gashapón, tienda, horas extra, novedades)."""
 import re, sys
-SRC = '../fans-of-rumble/css/estilos.css'   # el juego original, clonado al lado de este
+SRC = 'games/rumble/css/estilos.css'   # el juego original, que está en este mismo repositorio
 OUT = 'core/css/menus.css'
 css = open(SRC, encoding='utf-8').read()
 
